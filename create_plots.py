@@ -5,6 +5,7 @@ import helper
 
 from sklearn import metrics
 import matplotlib.pyplot as plt
+import itertools
 
 
 def plot_auroc(dataset, algorithm_result_file, output_file):
@@ -12,7 +13,7 @@ def plot_auroc(dataset, algorithm_result_file, output_file):
 
     for (algorithm, result_file) in algorithm_result_file:
         data = np.loadtxt(result_file)
-        ax.plot(range(data.shape[0]), data, label=algorithm)
+        ax.plot(range(data.shape[0]), data, label=algorithm, alpha=0.8)
 
     ax.set_xlabel('Iterations')
     ax.set_ylabel('ROC AUC')
@@ -28,7 +29,7 @@ def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
 
     for (algorithm, result_file) in algorithm_result_file:
         data = np.loadtxt(result_file, dtype=int)
-        ax.plot(range(data.shape[0]), data, label=algorithm)
+        ax.plot(range(data.shape[0]), data, label=algorithm, alpha=0.8)
 
     ax.set_xlabel('Iterations')
     ax.set_ylabel('# Anomalies')

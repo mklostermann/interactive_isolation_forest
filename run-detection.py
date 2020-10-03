@@ -37,6 +37,8 @@ def main():
             algorithms.iforest_eif.iforest_eif.detect(args.datasets, args.budget, args.runs)
         elif algorithm == "extended_iforest":
             algorithms.extended_iforest.extended_iforest.detect(args.datasets, args.budget, args.runs)
+        else:
+            print(f"Unknown algorithm {algorithm} is ignored.")
 
 
 if __name__ == '__main__':

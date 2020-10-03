@@ -15,7 +15,7 @@ def detect(datasets, budget, runs):
             os.makedirs(results_dir)
 
         for run in range(1, runs + 1):
-            iforest = sk.ensemble.IsolationForest().fit(data)
+            iforest = sk.ensemble.IsolationForest(n_estimators=100, max_samples=256).fit(data)
 
             # Inversion required, as it returns the "opposite of the anomaly score defined in the original paper"
             scores = -iforest.score_samples(data)

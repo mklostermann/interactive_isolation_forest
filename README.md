@@ -6,7 +6,7 @@ Comparison of different anomaly detection algorithms based on Isolation Forest w
 ## Algorithms
 Each sub directory provides a single algorithm.
 
-Algorithms can be executed running the python script `run-detection.py -ds DATASETS -r RUNS`
+Algorithms can be executed running the python script `run-detection.py -a ALGORITHMS -ds DATASETS -r RUNS`
 
 ## Data Sets
 Data sets are provided as CSV. The first column contains the label (nominal/anomaly),
@@ -42,7 +42,7 @@ Metrics are calculated using the script `calc_metrics.py [DATASETS] [ALGORITHMS]
 ## Plots
 Following plots are generated from the metrics (one plot for each data set,
 showing all algorithms):
-* # Anomalies / Iteration
+* Anomalies / Iteration
 * AUC ROC / Iteration
 * TODO?: P@n, R@n, F1@n
 

@@ -14,7 +14,7 @@ def get_data_file(dataset):
     return get_all_data_files(dataset, ".csv")[0]  # TODO: Implement something like get_next_data_file
 
 
-def get_all_data_files(dataset, extension):
+def get_all_data_files(dataset, extension=".csv"):
     return [os.path.abspath(file.path) for file in os.scandir(f"data_sets/{dataset}") if file.name.endswith(extension)]
 
 
@@ -90,3 +90,17 @@ def convert_all_arff_to_csv():
             pd.DataFrame(full_data).to_csv(csv_file, index=False)
 
             print(f"Succeeded, result was stored at {csv_file}")
+
+
+def get_filename(path):
+    return os.path.basename(path).rsplit(".", 1)[0]
+
+
+def save_queried_instances(queried_instances, results_dir, data_file, run):
+    queried_file = os.path.join(results_dir, f"queried_instances-{get_filename(data_file)}#{run}.csv")
+    np.savetxt(queried_file, queried_instances, fmt="%d", delimiter=",")
+
+
+def save_all_scores(all_scores, results_dir, data_file, run):
+    all_scores_file = os.path.join(results_dir, f"all_scores-{get_filename(data_file)}#{run}.csv")
+    np.savetxt(all_scores_file, all_scores, fmt='%f', delimiter=',')

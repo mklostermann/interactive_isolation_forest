@@ -26,8 +26,8 @@ The results directory contains numerical results of each run of the anomaly dete
 Folder structure: results/DATASET/ALGORITHM
 
 ### Original Results
-* queried_instances-#RUN.csv: Each line contains the index of the queried item (typically the most anomalous instance).
-* all_scores-#RUN.csv: Each line contains the anomaly scores of the current model (first line = iteration 0 -> no feedback)
+* queried_instances-DATA_FILE#RUN.csv: Each line contains the index of the queried item (typically the most anomalous instance).
+* all_scores-DATA_FILE#RUN-.csv: Each line contains the anomaly scores of the current model (first line = iteration 0 -> no feedback)
 
 ### Calculated Metrics
 Using the results, following metrics are calculated:

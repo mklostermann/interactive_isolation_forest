@@ -6,21 +6,19 @@ import helper
 # Isolation Forest as implemented by the eif (Extended Isolation Forest) module
 def detect(datasets, budget, runs):
     for dataset in datasets:
-        data_file = helper.get_data_file(dataset)
-        data, labels = helper.load_dataset(data_file)
-
         results_dir = helper.get_results_dir(dataset, "iforest_eif")
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
 
-        for run in range(1, runs + 1):
-            iforest = eif.iForest(data, ntrees=100, sample_size=256, ExtensionLevel=0)
-            scores = iforest.compute_paths(data)
+        for data_file in helper.get_all_data_files(dataset):
+            data, labels = helper.load_dataset(data_file)
 
-            all_scores = np.vstack([scores] * (budget + 1))
-            all_scores_file = os.path.join(results_dir, f"all_scores-{run}.csv")
-            np.savetxt(all_scores_file, all_scores, fmt='%f', delimiter=',')
+            for run in range(1, runs + 1):
+                iforest = eif.iForest(data, ntrees=100, sample_size=256, ExtensionLevel=0)
+                scores = iforest.compute_paths(data)
 
-            queried_instances = np.argsort(-scores)[np.arange(budget)]
-            queried_file = os.path.join(results_dir, f"queried_instances-{run}.csv")
-            np.savetxt(queried_file, queried_instances, fmt="%d", delimiter=",")
+                all_scores = np.vstack([scores] * (budget + 1))
+                helper.save_all_scores(all_scores, results_dir, data_file, run)
+
+                queried_instances = np.argsort(-scores)[np.arange(budget)]
+                helper.save_queried_instances(queried_instances, results_dir, data_file, run)

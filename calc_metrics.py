@@ -30,10 +30,10 @@ def main(datasets, algorithms):
                     _, labels = helper.load_dataset(helper.get_data_file(dataset))
 
                 for file in os.scandir(results_dir):
-                    match = re.search(r"all_scores-([0-9]+)\.csv", file.name)
+                    match = re.search(r"\Aall_scores-(\w+#\d+)\.csv\Z", file.name)
                     if match is not None:
                         calc_auroc(labels, file.path, os.path.join(results_dir, f"auroc-{match.group(1)}.csv"))
-                    match = re.search(r"queried_instances-([0-9]+)\.csv", file.name)
+                    match = re.search(r"\Aqueried_instances-(\w#\d+)\.csv\Z", file.name)
                     if match is not None:
                         calc_anomalies_seen(labels, file.path, os.path.join(results_dir, f"anomalies_seen-{match.group(1)}.csv"))
 

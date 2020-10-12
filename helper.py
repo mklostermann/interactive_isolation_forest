@@ -10,8 +10,8 @@ def get_all_datasets():
             if directory.is_dir() and not directory.name.startswith("__")]
 
 
-def get_data_file(dataset):
-    return get_all_data_files(dataset, ".csv")[0]  # TODO: Implement something like get_next_data_file
+def get_data_file(dataset, filename):
+    return os.path.abspath(f"data_sets/{dataset}/{filename}.csv")
 
 
 def get_all_data_files(dataset, extension=".csv"):

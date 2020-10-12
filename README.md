@@ -27,14 +27,16 @@ Folder structure: results/DATASET/ALGORITHM
 
 ### Original Results
 * queried_instances-DATA_FILE#RUN.csv: Each line contains the index of the queried item (typically the most anomalous instance).
-* all_scores-DATA_FILE#RUN-.csv: Each line contains the anomaly scores of the current model (first line = iteration 0 -> no feedback)
+* all_scores-DATA_FILE#RUN.csv: Each line contains the anomaly scores of the current model (first line = iteration 0 -> no feedback)
 
 ### Calculated Metrics
 Using the results, following metrics are calculated:
-* anomalies_seen-RUN.csv: Each line contains the number of anomalies seen of the run.
-* anomalies_seen.csv: Each line contains the number of anomalies seen averaged over all runs and the values for the 95% confidence intervals.
-* auroc-RUN.csv: Each line contains the AUC ROC of that run.
-* auroc.csv: Each line contains the AUC ROC averaged over all runs and the values for the 95% confidence intervals.
+* anomalies_seen-DATA_FILE#RUN.csv: Each line contains the number of anomalies seen of the run.
+* anomalies_seen-DATA_FILE.csv: Each line contains the number of anomalies seen averaged over all runs on the data file and the values for the standard deviation.
+* anomalies_seen.csv: Each line contains the number of anomalies seen averaged over all runs on all data files and the values for the standard deviation.
+* auroc-DATA_FILE#RUN.csv: Each line contains the AUC ROC of that run.
+* auroc-DATA_FILE.csv: Each line contains the AUC ROC averaged over all runs on the data file and the values for the standard devation.
+* auroc.csv: Each line contains the AUC ROC averaged over all runs on all data files and the values for the standard deviation.
 
 
 Metrics are calculated using the script `calc_metrics.py [DATASETS] [ALGORITHMS]`

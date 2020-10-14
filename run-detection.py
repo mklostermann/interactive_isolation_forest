@@ -6,6 +6,32 @@ import algorithms.loda_aad.loda_aad
 import algorithms.iforest_sklearn.iforest_sklearn
 import algorithms.iforest_eif.iforest_eif
 import algorithms.extended_iforest.extended_iforest
+import threading
+import time
+
+
+class DetectorThread(threading.Thread):
+    def __init__(self, algorithm, args):
+        threading.Thread.__init__(self)
+        self.algorithm = algorithm
+        self.args = args
+
+    def run(self):
+        if self.algorithm == "iforest_aad":
+            algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "iforest":
+            algorithms.iforest.iforest.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "loda_aad":
+            algorithms.loda_aad.loda_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "iforest_sklearn":
+            algorithms.iforest_sklearn.iforest_sklearn.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "iforest_eif":
+            algorithms.iforest_eif.iforest_eif.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "extended_iforest":
+            algorithms.extended_iforest.extended_iforest.detect(self.args.datasets, self.args.budget, self.args.runs)
+        else:
+            print(f"Unknown algorithm {self.algorithm} is ignored.")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Runs anomaly detection.")
@@ -13,8 +39,10 @@ def main():
                         help="algorithms to run the detection on (all if omitted)")
     parser.add_argument("-ds", "--datasets", type=str, nargs="*",
                         help="data sets to run the detection on (all if omitted)")
-    parser.add_argument("-b, --budget", dest="budget",  default=35, type=int, help="budget for feedback (default=35)")
+    parser.add_argument("-b, --budget", dest="budget", default=35, type=int, help="budget for feedback (default=35)")
     parser.add_argument("-r, --runs", dest="runs", default=1, type=int, help="number of repeated runs (default=1)")
+    parser.add_argument("-t, --threads", dest="threads", default=4, type=int,
+                        help="number of threads used to start algorithms in parallel (default=4)")
 
     args = parser.parse_args()
 
@@ -24,21 +52,19 @@ def main():
     if args.datasets is None:
         args.datasets = helper.get_all_datasets()
 
+    threads = []
     for algorithm in args.algorithms:
-        if algorithm == "iforest_aad":
-            algorithms.iforest_aad.iforest_aad.detect(args.datasets, args.budget, args.runs)
-        elif algorithm == "iforest":
-            algorithms.iforest.iforest.detect(args.datasets, args.budget, args.runs)
-        elif algorithm == "loda_aad":
-            algorithms.loda_aad.loda_aad.detect(args.datasets, args.budget, args.runs)
-        elif algorithm == "iforest_sklearn":
-            algorithms.iforest_sklearn.iforest_sklearn.detect(args.datasets, args.budget, args.runs)
-        elif algorithm == "iforest_eif":
-            algorithms.iforest_eif.iforest_eif.detect(args.datasets, args.budget, args.runs)
-        elif algorithm == "extended_iforest":
-            algorithms.extended_iforest.extended_iforest.detect(args.datasets, args.budget, args.runs)
-        else:
-            print(f"Unknown algorithm {algorithm} is ignored.")
+        while True:
+            if threading.activeCount() - 1 < args.threads:
+                thread = DetectorThread(algorithm, args)
+                thread.start()
+                threads.append(thread)
+                break
+            else:
+                time.sleep()
+
+    for thread in threads:
+        thread.join()
 
 
 if __name__ == '__main__':

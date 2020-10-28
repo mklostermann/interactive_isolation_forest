@@ -1,19 +1,23 @@
-import numpy as np
-import os
-import re
-import helper
+import argparse
 
-from sklearn import metrics
+import logging
 import matplotlib.pyplot as plt
-import itertools
+import pandas as pd
+
+import helper
 
 
 def plot_auroc(dataset, algorithm_result_file, output_file):
     fig, ax = plt.subplots()
 
+    i = 0
     for (algorithm, result_file) in algorithm_result_file:
-        data = np.loadtxt(result_file)
-        ax.plot(range(data.shape[0]), data, label=algorithm, alpha=0.8)
+        dataframe = pd.read_csv(result_file, header=None)
+        data = dataframe.to_numpy(dtype=float)
+
+        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3,
+                    errorevery=[i, len(algorithm_result_file)])
+        i = i + 1
 
     ax.set_xlabel('Iterations')
     ax.set_ylabel('ROC AUC')
@@ -27,9 +31,13 @@ def plot_auroc(dataset, algorithm_result_file, output_file):
 def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
     fig, ax = plt.subplots()
 
+    i = 0
     for (algorithm, result_file) in algorithm_result_file:
-        data = np.loadtxt(result_file)
-        ax.plot(range(data.shape[0]), data, label=algorithm, alpha=0.8)
+        dataframe = pd.read_csv(result_file, header=None)
+        data = dataframe.to_numpy(dtype=float)
+        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3,
+                    errorevery=[i, len(algorithm_result_file)])
+        i = i + 1
 
     ax.set_xlabel('Iterations')
     ax.set_ylabel('# Anomalies')
@@ -41,16 +49,45 @@ def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
 
 
 def main(datasets, algorithms):
+    logging.basicConfig(filename="log/create_plots.log", filemode='w',
+                        format='%(asctime)s [%(threadName)s] %(message)s', level=logging.INFO)
+    logging.info("==========")
+    logging.info(f"Creating plots for data sets {datasets} and algorithms {algorithms}")
+    logging.info("==========")
+
+    variants = ["all", "le05", "le10", "le20", "orig", "02", "05", "10", "20"]
+
     for dataset in datasets:
+        logging.info(f"Creating plots for {dataset}")
 
-        algorithm_result_file = helper.get_result_files_for_algorithms(dataset, algorithms, f"auroc.csv")
-        if any(algorithm_result_file):
-            plot_auroc(dataset, algorithm_result_file, helper.get_plot_file(dataset, f"auroc"))
+        for name in [f"auroc-{var}" for var in variants]:
+            algorithm_result_file = helper.get_result_files_for_algorithms(dataset, algorithms, f"{name}.csv")
+            if any(algorithm_result_file):
+                plot_auroc(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
 
-        algorithm_result_file = helper.get_result_files_for_algorithms(dataset, algorithms, f"anomalies_seen.csv")
-        if any(algorithm_result_file):
-            plot_anomalies_seen(dataset, algorithm_result_file, helper.get_plot_file(dataset, f"anomalies_seen"))
+        for name in [f"anomalies_seen-{var}" for var in variants]:
+            algorithm_result_file = helper.get_result_files_for_algorithms(dataset, algorithms, f"{name}.csv")
+            if any(algorithm_result_file):
+                plot_anomalies_seen(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
+
+    logging.info("==========")
+    logging.info("Finished")
+    logging.info("==========")
 
 
 if __name__ == '__main__':
-    main(helper.get_all_datasets(), helper.get_all_algorithms())
+    parser = argparse.ArgumentParser(description="Runs anomaly detection.")
+    parser.add_argument("-a", "--algorithms", type=str, nargs="*",
+                        help="algorithms to run the detection on (all if omitted)")
+    parser.add_argument("-ds", "--datasets", type=str, nargs="*",
+                        help="data sets to run the detection on (all if omitted)")
+
+    args = parser.parse_args()
+
+    if args.algorithms is None:
+        args.algorithms = helper.get_all_algorithms()
+
+    if args.datasets is None:
+        args.datasets = helper.get_all_datasets()
+
+    main(args.datasets, args.algorithms)

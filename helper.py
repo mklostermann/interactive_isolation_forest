@@ -3,6 +3,7 @@ import pandas as pd
 import scipy.io
 import os
 from scipy.io import arff
+import re
 
 
 def get_all_datasets():
@@ -12,6 +13,18 @@ def get_all_datasets():
 
 def get_data_file(dataset, filename):
     return os.path.abspath(f"data_sets/{dataset}/{filename}.csv")
+
+
+def get_outlier_rate(data_file_name):
+    outlier_rate = None
+    downsampled = False
+
+    match = re.search(r"_(\d\d)_(v?)", data_file_name)
+    if match is not None:
+        outlier_rate = int(match.group(1))
+        downsampled = match.group(2) is not None
+
+    return outlier_rate, downsampled
 
 
 def get_all_data_files(dataset, extension=".csv"):

@@ -15,10 +15,10 @@ def get_data_file(dataset, filename):
 
 
 def get_dataset_info_file():
-    return os.os.path.abspath("datasets/info.json")
+    return os.path.abspath("datasets/info.json")
 
 
-def get_outlier_rate(data_file_name):
+def get_outlier_rate(data_file_name): # TODO: remove (was moved to prepare_datasets, use DatasetInfo instead)
     outlier_rate = None
     downsampled = False
 
@@ -75,9 +75,6 @@ def convert_mat_to_csv(dataset):
     dataframe = pd.DataFrame(full_data)
 
     dataframe.to_csv(f"datasets/{dataset}/{dataset}.csv", index=False)
-
-
-
 
 
 def get_filename(path):

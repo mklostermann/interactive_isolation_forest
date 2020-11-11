@@ -2,17 +2,20 @@ import numpy as np
 import pandas as pd
 import scipy.io
 import os
-from scipy.io import arff
 import re
 
 
 def get_all_datasets():
-    return [directory.name for directory in os.scandir(os.path.join(os.getcwd(), "data_sets"))
+    return [directory.name for directory in os.scandir(os.path.join(os.getcwd(), "datasets"))
             if directory.is_dir() and not directory.name.startswith("__")]
 
 
 def get_data_file(dataset, filename):
-    return os.path.abspath(f"data_sets/{dataset}/{filename}.csv")
+    return os.path.abspath(f"datasets/{dataset}/{filename}.csv")
+
+
+def get_dataset_info_file():
+    return os.os.path.abspath("datasets/info.json")
 
 
 def get_outlier_rate(data_file_name):
@@ -28,7 +31,7 @@ def get_outlier_rate(data_file_name):
 
 
 def get_all_data_files(dataset, extension=".csv"):
-    return [os.path.abspath(file.path) for file in os.scandir(f"data_sets/{dataset}") if file.name.endswith(extension)]
+    return [os.path.abspath(file.path) for file in os.scandir(f"datasets/{dataset}") if file.name.endswith(extension)]
 
 
 def load_dataset(data_file):
@@ -62,7 +65,7 @@ def get_result_files_for_algorithms(dataset, algorithms, name):
 
 # TODO: Remove dead code
 def convert_mat_to_csv(dataset):
-    orig = scipy.io.loadmat(f"data_sets/{dataset}/{dataset}.mat")
+    orig = scipy.io.loadmat(f"datasets/{dataset}/{dataset}.mat")
     data = orig['X']
     labels = ["anomaly" if label == 1 else "nominal" for label in orig['y']]
 
@@ -71,38 +74,10 @@ def convert_mat_to_csv(dataset):
         full_data[f"x{i}"] = data[:, i]
     dataframe = pd.DataFrame(full_data)
 
-    dataframe.to_csv(f"data_sets/{dataset}/{dataset}.csv", index=False)
+    dataframe.to_csv(f"datasets/{dataset}/{dataset}.csv", index=False)
 
 
-def convert_all_arff_to_csv():
-    for dataset in get_all_datasets():
-        for file in get_all_data_files(dataset, ".arff"):
-            print(f"Converting data file {file}...")
 
-            # Load and convert data
-            dataframe = pd.DataFrame(arff.loadarff(file)[0])
-            data = {}
-            i = 0
-            for column in dataframe.columns:
-                if column.lower() == "id":
-                    continue
-                if column.lower() == "outlier":
-                    labels = ["anomaly" if outlier == b"yes" else "nominal" for outlier in dataframe[column].values]
-                    continue
-
-                if column != "id" and column != "outlier":
-                    data[f"{column}"] = dataframe[column].values
-                    i = i + 1
-
-            # Merge data and store as CSV
-            full_data = {"labels": labels}
-            for attribute in data:
-                full_data[attribute] = data[attribute]
-
-            csv_file = file.replace(".arff", ".csv")
-            pd.DataFrame(full_data).to_csv(csv_file, index=False)
-
-            print(f"Succeeded, result was stored at {csv_file}")
 
 
 def get_filename(path):

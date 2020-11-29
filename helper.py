@@ -1,8 +1,64 @@
 import numpy as np
 import pandas as pd
 import scipy.io
+import json
 import os
 import re
+
+
+class DatasetInfo():
+    def __init__(self, dataset, filename, filepath, samples_count, outlier_count, outlier_rate, filename_outlier_rate, attribute_count,
+               without_duplicates, normalized, downsampled_with_variations):
+        self.dataset = dataset
+        self.filename = filename
+        self.filepath = filepath
+        self.samples_count = samples_count
+        self.outlier_count = outlier_count
+        self.filename_outlier_rate = filename_outlier_rate # Outlier rate according to dataset file name (rounded; calculated without duplicates)
+        self.outlier_rate = outlier_rate
+        self.attribute_count = attribute_count
+        self.without_duplicates = without_duplicates
+        self.normalized = normalized
+        self.downsampled_with_variations = downsampled_with_variations
+
+    def get_data_file(self):
+        return os.path.abspath(self.filepath)
+
+    @classmethod
+    def fromfile(cls, dataset, filepath):
+        data, labels = helper.load_dataset(filepath)
+
+        filepath = os.path.relpath(filepath)
+        filename = helper.get_filename(filepath)
+        samples_count = labels.shape[0]
+        outlier_count = int(np.sum(labels))
+        outlier_rate = outlier_count / samples_count * 100
+        attribute_count = data.shape[1]
+        without_duplicates = "_withoutdupl" in filename
+        normalized = "_norm" in filename
+
+        match = re.search(r"_(\d\d)", filename)
+        filename_outlier_rate = int(match.group(1)) if match is not None else None
+
+        match = re.search(r"(_v\d\d)", filename)
+        downsampled_with_variations = match is not None
+
+        assert "-" not in filename, \
+            "Dataset file name must not contain '-' (required to parse result/metric files)"
+
+        return cls(dataset, filename, filepath, samples_count, outlier_count, outlier_rate, filename_outlier_rate,
+                   attribute_count, without_duplicates, normalized, downsampled_with_variations)
+
+    @classmethod
+    def fromdict(cls, dict):
+        return cls(dict["dataset"], dict["filename"], dict["filepath"], dict["samples_count"], dict["outlier_count"],
+                   dict["outlier_rate"], dict["filename_outlier_rate"], dict["attribute_count"], dict["without_duplicates"],
+                   dict["normalized"], dict["downsampled_with_variations"])
+
+
+def get_dataset_info():
+    with open(get_dataset_info_file(), 'r') as file:
+        return json.load(file, object_hook=lambda dct: DatasetInfo.fromdict(dct))
 
 
 def get_all_datasets():

@@ -39,6 +39,10 @@ def main():
                         help="algorithms to run the detection on (all if omitted)")
     parser.add_argument("-ds", "--datasets", type=str, nargs="*",
                         help="data sets to run the detection on (all if omitted)")
+    parser.add_argument("-norm", "--normalized", type=bool,
+                        help="Only normalized datasets")
+    parser.add_argument("-withoutdup", "--without_duplicates", type=bool,
+                        help="Only datasets without duplicates")
     parser.add_argument("-b, --budget", dest="budget", default=35, type=int, help="budget for feedback (default=35)")
     parser.add_argument("-r, --runs", dest="runs", default=1, type=int, help="number of repeated runs (default=1)")
     parser.add_argument("-t, --threads", dest="threads", default=4, type=int,
@@ -49,8 +53,20 @@ def main():
     if args.algorithms is None:
         args.algorithms = helper.get_all_algorithms()
 
-    if args.datasets is None:
-        args.datasets = helper.get_all_datasets()
+    dataset_info = helper.get_dataset_info()
+
+    args.datasets = [info for info in dataset_info
+                     if (args.datasets is None or info.dataset in args.datasets)
+                     and (args.normalized is None or info.normalized)
+                     and (args.without_duplicates is None or info.without_duplicates)]
+    #################################
+    # TODO use dataset info to run detection (in implementation of each algo -> KISS: straight forward code duplication)
+    ##################################
+
+    print(f"Running {args.algorithms} on {len(args.datasets)} datasets")
+    print(f"Dataset files:")
+    for info in args.datasets:
+        print(info.get_data_file())
 
     threads = []
     for algorithm in args.algorithms:

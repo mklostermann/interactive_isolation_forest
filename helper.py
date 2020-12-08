@@ -119,20 +119,6 @@ def get_result_files_for_algorithms(dataset, algorithms, name):
     return list(filter(lambda x: os.path.exists(x[1]), files))
 
 
-# TODO: Remove dead code
-def convert_mat_to_csv(dataset):
-    orig = scipy.io.loadmat(f"datasets/{dataset}/{dataset}.mat")
-    data = orig['X']
-    labels = ["anomaly" if label == 1 else "nominal" for label in orig['y']]
-
-    full_data = {"labels": labels}
-    for i in range(data.shape[1]):
-        full_data[f"x{i}"] = data[:, i]
-    dataframe = pd.DataFrame(full_data)
-
-    dataframe.to_csv(f"datasets/{dataset}/{dataset}.csv", index=False)
-
-
 def get_filename(path):
     return os.path.basename(path).rsplit(".", 1)[0]
 

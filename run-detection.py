@@ -43,7 +43,7 @@ def main():
                         help="Only normalized datasets")
     parser.add_argument("-withoutdup", "--without_duplicates", type=bool,
                         help="Only datasets without duplicates")
-    parser.add_argument("-b, --budget", dest="budget", default=35, type=int, help="budget for feedback (default=35)")
+    parser.add_argument("-b, --budget", dest="budget", default=-1, type=int, help="budget for feedback (default=auto=|O|)")
     parser.add_argument("-r, --runs", dest="runs", default=1, type=int, help="number of repeated runs (default=1)")
     parser.add_argument("-t, --threads", dest="threads", default=4, type=int,
                         help="number of threads used to start algorithms in parallel (default=4)")

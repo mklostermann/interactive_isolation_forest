@@ -108,6 +108,10 @@ def get_results_dir(dataset, algorithm=None):
     return os.path.abspath(os.path.join(os.getcwd(), f"results/{dataset}/{'' if algorithm is None else algorithm}"))
 
 
+def get_metrics_dir(dataset, algorithm=None):
+    return os.path.abspath(os.path.join(os.getcwd(), f"metrics/{dataset}/{'' if algorithm is None else algorithm}"))
+
+
 def get_plot_file(dataset, plotname):
     return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{plotname}.pdf"))
 
@@ -130,4 +134,4 @@ def save_queried_instances(queried_instances, results_dir, data_file, run):
 
 def save_all_scores(all_scores, results_dir, data_file, run):
     all_scores_file = os.path.join(results_dir, f"all_scores-{get_filename(data_file)}#{run}.csv")
-    np.savetxt(all_scores_file, all_scores, fmt='%f', delimiter=',')
+    np.savetxt(all_scores_file, all_scores, delimiter=',')

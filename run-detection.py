@@ -59,9 +59,6 @@ def main():
                      if (args.datasets is None or info.dataset in args.datasets)
                      and (args.normalized is None or info.normalized)
                      and (args.without_duplicates is None or info.without_duplicates)]
-    #################################
-    # TODO use dataset info to run detection (in implementation of each algo -> KISS: straight forward code duplication)
-    ##################################
 
     print(f"Running {args.algorithms} on {len(args.datasets)} datasets")
     print(f"Dataset files:")
@@ -77,7 +74,7 @@ def main():
                 threads.append(thread)
                 break
             else:
-                time.sleep()
+                time.sleep(100)
 
     for thread in threads:
         thread.join()

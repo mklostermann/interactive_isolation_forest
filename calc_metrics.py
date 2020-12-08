@@ -13,18 +13,14 @@ def calc_auroc(labels, input_file, output_file):
     np.savetxt(output_file, auroc, delimiter=',')
 
 
-def calc_anomalies_seen(labels, input_file, output_file):
-    queried_instances = np.loadtxt(input_file, delimiter=',', dtype=int)
-    anomalies_seen = np.concatenate(([0], np.cumsum(labels[queried_instances])))
-    np.savetxt(output_file, anomalies_seen, fmt='%d', delimiter=',')
-
-
 def main(datasets, algorithms):
     logging.basicConfig(filename="log/calc_metrics.log", filemode='w',
                         format='%(asctime)s [%(threadName)s] %(message)s', level=logging.INFO)
     logging.info("==========")
     logging.info(f"Calculating metrics for data sets {datasets} and algorithms {algorithms}")
     logging.info("==========")
+
+    dataset_infos = helper.get_dataset_info()
 
     for dataset in datasets:
         logging.info(f"Working on data set {dataset}...")
@@ -34,6 +30,9 @@ def main(datasets, algorithms):
 
             results_dir = helper.get_results_dir(dataset, algorithm)
             metrics_dir = helper.get_metrics_dir(dataset, algorithm)
+
+            if not os.path.exists(metrics_dir):
+                os.makedirs(metrics_dir)
 
             if os.path.exists(results_dir):
 
@@ -50,12 +49,27 @@ def main(datasets, algorithms):
                         if match.group(1) == "all_scores":
                             calc_auroc(labels[filename], file.path,
                                        os.path.join(metrics_dir,
-                                                    f"auroc-{match.group(2)}#{match.group(3)}.csv"))
+                                                    f"auroc-{filename}#{match.group(3)}.csv"))
 
                         if match.group(1) == "queried_instances":
-                            calc_anomalies_seen(labels[filename], file.path,
-                                                os.path.join(metrics_dir,
-                                                             f"anomalies_seen-{match.group(2)}#{match.group(3)}.csv"))
+                            # Anomalies seen
+                            queried_instances = np.loadtxt(file.path, delimiter=',', dtype=int)
+                            anomalies_seen = np.concatenate(([0], np.cumsum(labels[filename][queried_instances])))
+                            np.savetxt(os.path.join(metrics_dir, f"anomalies_seen-{filename}#{match.group(3)}.csv"), anomalies_seen, fmt='%d', delimiter=',')
+
+                            # P@n
+                            info = next(info for info in dataset_infos if info.filename == filename)
+                            if anomalies_seen.size > info.outlier_count:
+                                precision_n = anomalies_seen[info.outlier_count] / info.outlier_count
+                                adjusted_precision_n = (precision_n - (info.outlier_count / info.samples_count))\
+                                                       / (1 - (info.outlier_count / info.samples_count))
+                                average_precision = sum([(anomalies_seen[i] / i) for i in range(1, info.outlier_count + 1)]) / info.outlier_count
+                                adjusted_average_precision = (average_precision - (info.outlier_count / info.samples_count))\
+                                                             / (1 - (info.outlier_count / info.samples_count))
+
+                                np.savetxt(os.path.join(metrics_dir, f"precision-{filename}#{match.group(3)}.csv"),
+                                           [precision_n, adjusted_precision_n, average_precision, adjusted_average_precision], delimiter=',')
+
                     else:
                         logging.info(f"File {file.path} is ignored")
             else:

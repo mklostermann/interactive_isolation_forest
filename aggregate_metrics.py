@@ -132,6 +132,9 @@ def main(datasets, algorithms):
 
 
 if __name__ == '__main__':
+    # TODO: Delete this obsolete file when I am sure that I do not need it anymore (conains some special handling for
+    # datasets with variants).
+    raise Exception("Obsolete file, did you want to run calc_metrics?")
     try:
         main(helper.get_all_datasets(), helper.get_all_algorithms())
     except:

@@ -55,20 +55,21 @@ def main(datasets, algorithms):
     logging.info(f"Creating plots for data sets {datasets} and algorithms {algorithms}")
     logging.info("==========")
 
+    # TODO: Remove stuff to handle variants (configurable)
     variants = ["all", "le05", "le10", "le20", "orig", "02", "05", "10", "20"]
 
     for dataset in datasets:
         logging.info(f"Creating plots for {dataset}")
 
-        for name in [f"auroc-{var}" for var in variants]:
-            algorithm_result_file = helper.get_result_files_for_algorithms(dataset, algorithms, f"{name}.csv")
-            if any(algorithm_result_file):
-                plot_auroc(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
+        name = "auroc"
+        algorithm_result_file = helper.get_metrics_files_for_algorithms(dataset, algorithms, f"{name}.csv")
+        if any(algorithm_result_file):
+            plot_auroc(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
 
-        for name in [f"anomalies_seen-{var}" for var in variants]:
-            algorithm_result_file = helper.get_result_files_for_algorithms(dataset, algorithms, f"{name}.csv")
-            if any(algorithm_result_file):
-                plot_anomalies_seen(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
+        name = "anomalies_seen"
+        algorithm_result_file = helper.get_metrics_files_for_algorithms(dataset, algorithms, f"{name}.csv")
+        if any(algorithm_result_file):
+            plot_anomalies_seen(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
 
     logging.info("==========")
     logging.info("Finished")

@@ -115,10 +115,10 @@ def get_plot_file(dataset, plotname):
     return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{plotname}.pdf"))
 
 
-def get_result_files_for_algorithms(dataset, algorithms, name):
-    results_dir = get_results_dir(dataset)
+def get_metrics_files_for_algorithms(dataset, algorithms, name):
+    metrics_dir = get_metrics_dir(dataset)
 
-    files = [(algorithm, os.path.join(results_dir, algorithm, name)) for algorithm in algorithms]
+    files = [(algorithm, os.path.join(metrics_dir, algorithm, name)) for algorithm in algorithms]
     return list(filter(lambda x: os.path.exists(x[1]), files))
 
 

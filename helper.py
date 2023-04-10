@@ -25,10 +25,10 @@ class DatasetInfo():
 
     @classmethod
     def fromfile(cls, dataset, filepath):
-        data, labels = helper.load_dataset(filepath)
+        data, labels = load_dataset(filepath)
 
         filepath = os.path.relpath(filepath)
-        filename = helper.get_filename(filepath)
+        filename = get_filename(filepath)
         samples_count = labels.shape[0]
         outlier_count = int(np.sum(labels))
         outlier_rate = outlier_count / samples_count * 100

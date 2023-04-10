@@ -1,10 +1,10 @@
-# isolation_forest-aad
+ # isolation_forest-aad
 Comparison of different anomaly detection algorithms based on Isolation Forest with active learning (active anomaly detection).
 
 ```pip install -r requirements.txt```
 
 ## Algorithms
-Each sub directory provides a single algorithm.
+Each subdirectory provides a single algorithm.
 
 Algorithms can be executed running the python script `run-detection.py -a ALGORITHMS -ds DATASETS -r RUNS`
 
@@ -19,6 +19,8 @@ anomaly,0,1,0,0,0,0,0,0.255319,0.051489,0.298721,0.003467,0.422915,0.414912
 
 Each data set is located in a separate directory, which might contain additional
 data. See the respective README.md for details about the data set.
+
+Script `prepare_datasets.py` is used to collect information about the datasets, which is stored in info.json.
 
 ## Results
 The results directory contains numerical results of each run of the anomaly detection algorithms.

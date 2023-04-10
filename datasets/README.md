@@ -1,8 +1,7 @@
 These datasets are from
-From https://github.com/shubhomoydas/ad_examples/tree/master/ad_examples/datasets
+From https://github.com/shubhomoydas/ad_examples/tree/master/ad_examples/datasets/anomaly
 
 \cite{das-incorporating_feedback_into_tree-based_anomaly_detection}
 
-Paper provides details about the construction.
+Larger datasets were sub-sampled (*_sub), see paper for details about the construction.
 
-Original source: http://archive.ics.uci.edu/ml/datasets/Abalone

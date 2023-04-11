@@ -13,12 +13,11 @@ def detect(datasets, budget, runs):
             os.makedirs(results_dir)
 
         data_file = dataset_info.get_data_file()
-        actual_runs = runs if dataset_info.downsampled_with_variations else runs * 10
         actual_budget = dataset_info.outlier_count if budget <= 0 else budget
         data, labels = helper.load_dataset(data_file)
         samples = min(dataset_info.samples_count, 256)
 
-        for run in range(1, actual_runs + 1):
+        for run in range(1, runs + 1):
             iforest = eif.iForest(data, ntrees=100, sample_size=samples, ExtensionLevel=0)
             scores = iforest.compute_paths(data)
 

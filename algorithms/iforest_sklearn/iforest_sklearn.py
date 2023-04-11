@@ -13,11 +13,10 @@ def detect(datasets, budget, runs):
             os.makedirs(results_dir)
 
         data_file = dataset_info.get_data_file()
-        actual_runs = runs if dataset_info.downsampled_with_variations else runs * 10
         actual_budget = dataset_info.outlier_count if budget <= 0 else budget
         data, labels = helper.load_dataset(data_file)
 
-        for run in range(1, actual_runs + 1):
+        for run in range(1, runs + 1):
             iforest = sk.ensemble.IsolationForest(n_estimators=100, max_samples=256).fit(data)
 
             # Inversion required, as it returns the "opposite of the anomaly score defined in the original paper"

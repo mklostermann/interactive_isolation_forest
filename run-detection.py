@@ -1,11 +1,8 @@
 import argparse
 import helper
+import algorithms.iif.iif
 import algorithms.iforest_aad.iforest_aad
-import algorithms.iforest.iforest
-import algorithms.loda_aad.loda_aad
 import algorithms.iforest_sklearn.iforest_sklearn
-import algorithms.iforest_eif.iforest_eif
-import algorithms.extended_iforest.extended_iforest
 import threading
 import time
 
@@ -17,7 +14,9 @@ class DetectorThread(threading.Thread):
         self.args = args
 
     def run(self):
-        if self.algorithm == "iforest_aad":
+        if self.algorithm == "iif":
+            algorithms.iif.iif.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "iforest_aad":
             algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_sklearn":
             algorithms.iforest_sklearn.iforest_sklearn.detect(self.args.datasets, self.args.budget, self.args.runs)
@@ -35,7 +34,8 @@ def main():
                         help="Only normalized datasets")
     parser.add_argument("-withoutdup", "--without_duplicates", type=bool,
                         help="Only datasets without duplicates")
-    parser.add_argument("-b, --budget", dest="budget", default=-1, type=int, help="budget for feedback (default=auto=|O|)")
+    parser.add_argument("-b, --budget", dest="budget", default=-1, type=int,
+                        help="budget for feedback (default=auto=|O|)")
     parser.add_argument("-r, --runs", dest="runs", default=1, type=int, help="number of repeated runs (default=1)")
     parser.add_argument("-t, --threads", dest="threads", default=4, type=int,
                         help="number of threads used to start algorithms in parallel (default=4)")
@@ -60,7 +60,7 @@ def main():
     threads = []
     for algorithm in args.algorithms:
         while True:
-            if threading.activeCount() - 1 < args.threads:
+            if threading.active_count() - 1 < args.threads:
                 thread = DetectorThread(algorithm, args)
                 thread.start()
                 threads.append(thread)

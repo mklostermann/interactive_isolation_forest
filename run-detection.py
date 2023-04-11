@@ -19,16 +19,8 @@ class DetectorThread(threading.Thread):
     def run(self):
         if self.algorithm == "iforest_aad":
             algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
-        elif self.algorithm == "iforest":
-            algorithms.iforest.iforest.detect(self.args.datasets, self.args.budget, self.args.runs)
-        elif self.algorithm == "loda_aad":
-            algorithms.loda_aad.loda_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_sklearn":
             algorithms.iforest_sklearn.iforest_sklearn.detect(self.args.datasets, self.args.budget, self.args.runs)
-        elif self.algorithm == "iforest_eif":
-            algorithms.iforest_eif.iforest_eif.detect(self.args.datasets, self.args.budget, self.args.runs)
-        elif self.algorithm == "extended_iforest":
-            algorithms.extended_iforest.extended_iforest.detect(self.args.datasets, self.args.budget, self.args.runs)
         else:
             print(f"Unknown algorithm {self.algorithm} is ignored.")
 

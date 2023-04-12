@@ -1,3 +1,5 @@
+import argparse
+
 import numpy as np
 import os
 import re
@@ -88,7 +90,7 @@ def main(datasets, algorithms):
                             anomalies_seen[filename].append(value)
 
                             # TODO: Add metric (or not?)
-                            # P@n
+                            # P@n (n = |O|)
                             # info = next(info for info in dataset_infos if info.filename == filename)
                             # if anomalies_seen.size > info.outlier_count:
                             #     precision_n = anomalies_seen[info.outlier_count] / info.outlier_count
@@ -100,6 +102,8 @@ def main(datasets, algorithms):
                             #
                             #     np.savetxt(os.path.join(metrics_dir, f"precision-{filename}#{match.group(3)}.csv"),
                             #                [precision_n, adjusted_precision_n, average_precision, adjusted_average_precision], delimiter=',')
+
+                            # R@n (n = |O|)
 
                     else:
                         logging.info(f"File {file.path} is ignored")
@@ -124,7 +128,18 @@ def main(datasets, algorithms):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Calculate metrics from results.")
+    parser.add_argument("-a", "--algorithms", type=str, nargs="*",
+                        help="algorithms to run the detection on (all if omitted)")
+    parser.add_argument("-ds", "--datasets", type=str, nargs="*",
+                        help="data sets to run the detection on (all if omitted)")
+
+    args = parser.parse_args()
+
+    algorithms = helper.get_all_algorithms() if args.algorithms is None else args.algorithms
+    datasets = helper.get_all_datasets() if args.datasets is None else args.datasets
+
     try:
-        main(helper.get_all_datasets(), helper.get_all_algorithms())
+        main(datasets, algorithms)
     except:
         logging.exception("Exception in main")

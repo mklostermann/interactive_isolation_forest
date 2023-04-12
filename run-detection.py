@@ -3,6 +3,7 @@ import helper
 import algorithms.iif.iif
 import algorithms.iforest_aad.iforest_aad
 import algorithms.iforest_sklearn.iforest_sklearn
+import algorithms.tiws_if.tiws_if
 import threading
 import time
 
@@ -20,6 +21,8 @@ class DetectorThread(threading.Thread):
             algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_sklearn":
             algorithms.iforest_sklearn.iforest_sklearn.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "tiws_if":
+            algorithms.tiws_if.tiws_if.detect(self.args.datasets, self.args.budget, self.args.runs)
         else:
             print(f"Unknown algorithm {self.algorithm} is ignored.")
 

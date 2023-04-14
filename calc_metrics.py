@@ -1,6 +1,7 @@
 import argparse
 
 import numpy as np
+import scipy.stats as st
 import os
 import re
 import helper
@@ -21,8 +22,15 @@ def calc_mean(data, output_file):
         return
 
     mean = np.mean(data, axis=0)
-    stddev = np.std(data, axis=0)
-    np.savetxt(output_file, np.array([mean, stddev]), delimiter=',')
+    # stddev = np.std(data, axis=0)
+
+    cidev = []
+    npdata = np.array(data)
+    for i in range(0, npdata.shape[1]): # For every iteration of all runs
+        iter_data = npdata[:, i]
+        ci = st.norm.interval(confidence=0.95, loc=mean[i], scale=st.sem(iter_data))
+        cidev.append(ci[1] - ci[0])
+    np.savetxt(output_file, np.array([mean, cidev]), delimiter=',')
 
 
 def collect_data(data):

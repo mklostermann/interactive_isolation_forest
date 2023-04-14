@@ -104,21 +104,29 @@ def main(datasets, algorithms):
                             #                [precision_n, adjusted_precision_n, average_precision, adjusted_average_precision], delimiter=',')
 
                             # R@n (n = |O|)
+                    elif file.name.__contains__("omd_summary_feed_"):  # Special handling for OMD
+                        omd_anomalies_seen = np.loadtxt(file.path, delimiter=',', dtype=int, skiprows=1)
 
+                        filename = file.name  # TODO: supply dataset file name, e.g. yeast
+                        anomalies_seen[filename] = []
+                        for i in range(0, omd_anomalies_seen.shape[0]):
+                            anomalies_seen[filename].append(omd_anomalies_seen[i][1:])  # Skip first element (iter)
                     else:
                         logging.info(f"File {file.path} is ignored")
 
-                if any(auroc) and any(anomalies_seen):
+                if any(anomalies_seen):
+                    logging.info("Calculating mean (...) of seen anomalies")
+                    data = collect_data(anomalies_seen)
+                    calc_mean(data, os.path.join(metrics_dir, f"anomalies_seen.csv"))
+
+                if any(auroc):
                     logging.info("Calculating mean (...) of AUROC")
                     data = collect_data(auroc)
                     calc_mean(data, os.path.join(metrics_dir, f"auroc.csv"))
 
-                    logging.info("Calculating mean (...) of seen anomalies")
-                    data = collect_data(anomalies_seen)
-                    calc_mean(data, os.path.join(metrics_dir, f"anomalies_seen.csv"))
-                else:
+                if not any(anomalies_seen):
                     logging.warning(
-                        f"No files to calculate mean of AUROC / seen anomalies for {dataset}/{algorithm}")
+                        f"No files to calculate mean of seen anomalies for {dataset}/{algorithm}")
             else:
                 logging.warning(f"No result files for {dataset}/{algorithm}")
 

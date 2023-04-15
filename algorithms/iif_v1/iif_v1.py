@@ -95,15 +95,13 @@ def detect(datasets, budget, runs):
                     # - Get the index of the TiWS-iForest and (from get_values())
                     # - Create the TiWS-iForest by using the trees for a new forest
                     # - Evaluate scores and query anomaly
-                    argmax_supervised = get_last_occurrence_argmax(ap_forest_supervised)
-                    tiws_indices = learned_ordering[0:argmax_supervised+1]
+                    n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
+                    tiws_indices = learned_ordering[0:n_trees]
+                    sk_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
+                    sk_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
+                    sk_IF.n_estimators = n_trees
 
-                    # MKL: Fitting the tree is not required, but somehow I need to create a forest to replace the trees.
-                    tiws_forest = IsolationForest(n_estimators=argmax_supervised + 1).fit(data)
-                    tiws_forest.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
-                    tiws_forest.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
-
-                    scores = -tiws_forest.score_samples(data)
+                    scores = -sk_IF.score_samples(data)
                     for j in range(0, dataset_info.samples_count + 1):
                         queried = np.argsort(-scores)[j]
                         if queried not in queried_instances:

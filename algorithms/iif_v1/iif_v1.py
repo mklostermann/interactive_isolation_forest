@@ -7,11 +7,12 @@ import matplotlib.pylab as plt
 
 import helper
 
-# TiWS-iForest applied to IAD (as is -> new IF after each feedback)
+# IIF version 1
+# Basically an incremental TiWS-iForest (incremental update of initial IF).
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "iif_v1")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -27,17 +28,15 @@ def detect(datasets, budget, runs):
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.
 
+            # unsupervised train on the full train_data
+            # the weakly supervised train will be performed only on supervised_data
+            # sk_IF is the standard sklearn Isolation Forest
+            sk_IF = IsolationForest().fit(data)
+
             for i in range(0, actual_budget + 1):
-                # UNSUPERVISED TRAIN --------------------------------------------------------------
-
-                # unsupervised train on the full train_data
-                # the weakly supervised train will be performed only on supervised_data
-                # sk_IF is the standard sklearn Isolation Forest
-                sk_IF = IsolationForest().fit(data)
-
                 if i == 0:
                     # Initially, we only have a plain isolation forest; inversion required, as it returns the "opposite
-                    # of the anomaly score defined in the original paper" TODO: Verify if this is still true!?
+                    # of the anomaly score defined in the original paper"
                     scores = -sk_IF.score_samples(data)
                     queried = np.argsort(-scores)[0]
                 else:

@@ -35,7 +35,7 @@ def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
     for (algorithm, result_file) in algorithm_result_file:
         dataframe = pd.read_csv(result_file, header=None)
         data = dataframe.to_numpy(dtype=float)
-        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3,
+        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3, # TODO: Assign same label as the algorithm is referenced in my thesis (e.g. iforest_skelarn -> IF, if_aad -> IF-AAD)
                     errorevery=(i, len(algorithm_result_file)))
         i = i + 1
 

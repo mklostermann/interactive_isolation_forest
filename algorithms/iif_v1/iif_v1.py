@@ -99,7 +99,7 @@ def detect(datasets, budget, runs):
                     tiws_indices = learned_ordering[0:argmax_supervised+1]
 
                     # MKL: Fitting the tree is not required, but somehow I need to create a forest to replace the trees.
-                    tiws_forest = IsolationForest(n_estimators=argmax_supervised + 1, random_state=0).fit(data)
+                    tiws_forest = IsolationForest(n_estimators=argmax_supervised + 1).fit(data)
                     tiws_forest.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
                     tiws_forest.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
 

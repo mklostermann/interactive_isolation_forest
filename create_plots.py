@@ -41,6 +41,7 @@ def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
 
     ax.set_xlabel('Iterations')
     ax.set_ylabel('# Anomalies')
+    ax.set_ylim([0, data.shape[1]])
     ax.set_title(dataset.upper())
     ax.legend()
 

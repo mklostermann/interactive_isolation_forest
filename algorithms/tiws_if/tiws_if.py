@@ -21,19 +21,19 @@ def detect(datasets, budget, runs):
         data, labels = helper.load_dataset(data_file)
 
         for run in range(1, runs + 1):
-            all_scores=np.zeros(shape=(actual_budget + 1, dataset_info.samples_count))
+            all_scores=np.zeros(shape=(actual_budget, dataset_info.samples_count))
             queried_instances = []
 
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.
 
-            for i in range(0, actual_budget + 1):
+            for i in range(0, actual_budget):
                 # UNSUPERVISED TRAIN --------------------------------------------------------------
 
                 # unsupervised train on the full train_data
                 # the weakly supervised train will be performed only on supervised_data
                 # sk_IF is the standard sklearn Isolation Forest
-                sk_IF = IsolationForest().fit(data)
+                sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
 
                 if i == 0:
                     # Initially, we only have a plain isolation forest; inversion required, as it returns the "opposite

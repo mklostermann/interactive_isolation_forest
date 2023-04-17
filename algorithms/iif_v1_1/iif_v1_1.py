@@ -8,11 +8,11 @@ import matplotlib.pylab as plt
 import helper
 
 # IIF version 1
-# Basically an incremental TiWS-iForest (update of initial IF).
+# Basically an incremental TiWS-iForest (incremental update of initial IF).
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "iif_v1")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "iif_v1_1")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -97,11 +97,11 @@ def detect(datasets, budget, runs):
                     # - Evaluate scores and query anomaly
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
                     tiws_indices = learned_ordering[0:n_trees]
-                    tiws_if = IsolationForest(n_trees=0, max_samples=256)
-                    tiws_if.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
-                    tiws_if.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
+                    sk_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
+                    sk_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
+                    sk_IF.n_estimators = n_trees
 
-                    scores = -tiws_if.score_samples(data)
+                    scores = -sk_IF.score_samples(data)
                     for j in range(0, dataset_info.samples_count + 1):
                         queried = np.argsort(-scores)[j]
                         if queried not in queried_instances:

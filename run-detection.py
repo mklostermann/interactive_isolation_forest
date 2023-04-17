@@ -1,6 +1,7 @@
 import argparse
 import helper
 import algorithms.iif_v1.iif_v1
+import algorithms.iif_v1_1.iif_v1_1
 import algorithms.iif_v2.iif_v2
 import algorithms.iif_v3.iif_v3
 import algorithms.iforest_aad.iforest_aad
@@ -20,6 +21,8 @@ class DetectorThread(threading.Thread):
     def run(self):
         if self.algorithm == "iif_v1":
             algorithms.iif_v1.iif_v1.detect(self.args.datasets, self.args.budget, self.args.runs)
+        if self.algorithm == "iif_v1_1":
+            algorithms.iif_v1_1.iif_v1_1.detect(self.args.datasets, self.args.budget, self.args.runs)
         if self.algorithm == "iif_v2":
             algorithms.iif_v2.iif_v2.detect(self.args.datasets, self.args.budget, self.args.runs)
         if self.algorithm == "iif_v3":

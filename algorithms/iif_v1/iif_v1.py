@@ -97,7 +97,8 @@ def detect(datasets, budget, runs):
                     # - Evaluate scores and query anomaly
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
                     tiws_indices = learned_ordering[0:n_trees]
-                    tiws_if = IsolationForest(n_trees=0, max_samples=256)
+                    tiws_if = IsolationForest(n_estimators=n_trees, max_samples=256)
+                    tiws_if.fit(data) # Not elegant, but otherwise it cannot be used for scoring later.
                     tiws_if.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
                     tiws_if.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
 

@@ -56,6 +56,13 @@ def detect(datasets, budget, runs):
                     # sorted_tree_test       : tree_test sorted according to learned_ordering
                     # ap_forest_test         : collection of average precision of each tree in the forests obtained with the learned ordering
 
+                    # MKL: We need to shuffle the trees first, otherwise if there are  equally bad trees, always the
+                    # newest would be removed. This should improve as ass bad trees are replaced regularly (by chance).
+                    shuffled_indices = np.arange(sk_IF.n_estimators)
+                    np.random.shuffle(shuffled_indices)
+                    sk_IF.estimators_ = np.array(sk_IF.estimators_)[shuffled_indices]
+                    sk_IF.estimators_features_ = np.array(sk_IF.estimators_)[shuffled_indices]
+
                     # train anomaly scores
                     _, tree_supervised = compute_tree_anomaly_scores(sk_IF,
                                                                      supervised_data)
@@ -70,7 +77,7 @@ def detect(datasets, budget, runs):
                     # candidate forests for TiWS-iForest.
                     learned_ordering = np.argsort(ap_tree_supervised)[::-1]
 
-                    # Create new trees as replacement for dropped ones
+                    # Create new trees as replacement for dropped ones.
                     new_if = IsolationForest(n_estimators=10, max_samples=256).fit(data)
                     sk_IF.estimators_ = list(np.array(sk_IF.estimators_)[learned_ordering[0:90]])
                     sk_IF.estimators_.extend(np.array(new_if.estimators_))

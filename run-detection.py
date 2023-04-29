@@ -5,6 +5,7 @@ import algorithms.iif_v1_1.iif_v1_1
 import algorithms.iif_v2.iif_v2
 import algorithms.iif_v3.iif_v3
 import algorithms.iif_v4.iif_v4
+import algorithms.iif_v5.iif_v5
 import algorithms.iforest_aad.iforest_aad
 import algorithms.iforest_sklearn.iforest_sklearn
 import algorithms.tiws_if.tiws_if
@@ -30,6 +31,8 @@ class DetectorThread(threading.Thread):
             algorithms.iif_v3.iif_v3.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iif_v4":
             algorithms.iif_v4.iif_v4.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "iif_v5":
+            algorithms.iif_v5.iif_v5.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_aad":
             algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_sklearn":

@@ -13,7 +13,11 @@ def detect(datasets, budget, runs):
 # TODO: set learning rate (...) as in paper
         data_file = dataset_info.get_data_file()
         actual_budget = dataset_info.outlier_count if budget <= 0 else budget
-        omd_args = f"./iforest.exe -i {data_file} -o {results_dir}/omd -t 100 -s 256 -m 1 -l 2 -a 1 -w 2 -f {actual_budget} -x {runs}"
+        # -m 1 = preserve one meta-data column
+        # -l 1 = loglikelihood
+        # -a 1 = learning rate like in paper
+        # -w 1 = l2 regularizer
+        omd_args = f"./iforest.exe -i {data_file} -o {results_dir}/omd -t 100 -s 256 -m 1 -l 1 -a 1 -w 1 -f {actual_budget} -x {runs}"
         subprocess.run(omd_args.split(" "), cwd=os.path.abspath("../FeedbackIsolationForest"))
 
         # Prepare original output files for metrics calculation by removing files we do not need.

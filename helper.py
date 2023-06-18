@@ -129,8 +129,3 @@ def get_filename(path):
 def save_queried_instances(queried_instances, results_dir, data_file, run):
     queried_file = os.path.join(results_dir, f"queried_instances-{get_filename(data_file)}#{run}.csv")
     np.savetxt(queried_file, queried_instances, fmt="%d", delimiter=",")
-
-
-def save_all_scores(all_scores, results_dir, data_file, run):
-    all_scores_file = os.path.join(results_dir, f"all_scores-{get_filename(data_file)}#{run}.csv")
-    np.savetxt(all_scores_file, all_scores, delimiter=',')

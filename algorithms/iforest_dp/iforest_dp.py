@@ -17,7 +17,6 @@ def detect(datasets, budget, runs):
         data, labels = helper.load_dataset(data_file)
 
         for run in range(1, runs + 1):
-            all_scores=np.zeros(shape=(actual_budget, dataset_info.samples_count))
             queried_instances = []
 
             for i in range(0, actual_budget):
@@ -32,8 +31,6 @@ def detect(datasets, budget, runs):
                     if queried not in queried_instances:
                         break
 
-                all_scores[i, :] = scores
                 queried_instances.append(queried)
 
-            helper.save_all_scores(all_scores, results_dir, data_file, run)
             helper.save_queried_instances(queried_instances, results_dir, data_file, run)

@@ -22,7 +22,6 @@ def detect(datasets, budget, runs):
         data, labels = helper.load_dataset(data_file)
 
         for run in range(1, runs + 1):
-            all_scores=np.zeros(shape=(actual_budget, dataset_info.samples_count))
             queried_instances = []
 
             # Following code is mainly from weakly_supervised_algo()
@@ -123,10 +122,8 @@ def detect(datasets, budget, runs):
                         tiws_IF.n_estimators = sk_IF.n_estimators
 
 
-                all_scores[i, :] = scores
                 queried_instances.append(queried)
 
-            helper.save_all_scores(all_scores, results_dir, data_file, run)
             helper.save_queried_instances(queried_instances, results_dir, data_file, run)
 
 

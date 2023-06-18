@@ -7,15 +7,6 @@ import re
 import helper
 import logging
 
-from sklearn import metrics
-
-
-def calc_auroc(labels, input_file, output_file):
-    all_scores = np.loadtxt(input_file, delimiter=',')
-    auroc = [metrics.roc_auc_score(labels, all_scores[i, :]) for i in range(all_scores.shape[0])]
-    np.savetxt(output_file, auroc, delimiter=',')
-    return auroc
-
 
 def calc_mean(data, output_file):
     if not data:
@@ -26,7 +17,7 @@ def calc_mean(data, output_file):
 
     cidev = []
     npdata = np.array(data)
-    for i in range(0, npdata.shape[1]): # For every iteration of all runs
+    for i in range(0, npdata.shape[1]):  # For every iteration of all runs
         iter_data = npdata[:, i]
         ci = st.norm.interval(confidence=0.95, loc=mean[i], scale=st.sem(iter_data))
         cidev.append(ci[1] - ci[0])
@@ -64,11 +55,10 @@ def main(datasets, algorithms):
                 os.makedirs(metrics_dir)
 
             if os.path.exists(results_dir):
-                auroc = {}
                 anomalies_seen = {}
 
                 for file in os.scandir(results_dir):
-                    match = re.search(r"\A(all_scores|queried_instances)-(\w+)#(\d+)\.csv\Z", file.name)
+                    match = re.search(r"\A(queried_instances)-(\w+)#(\d+)\.csv\Z", file.name)
                     if match is not None:
                         logging.info(f"Calculating metrics for file {file.path}")
                         filename = match.group(2)
@@ -76,15 +66,6 @@ def main(datasets, algorithms):
                             data_file = helper.get_data_file(dataset, filename)
                             logging.info(f"Loading data file {data_file} for {filename}")
                             _, labels[filename] = helper.load_dataset(data_file)
-
-                        if match.group(1) == "all_scores":
-                            value = calc_auroc(labels[filename], file.path,
-                                       os.path.join(metrics_dir,
-                                                    f"auroc-{filename}#{match.group(3)}.csv"))
-                            if filename not in auroc:
-                                auroc[filename] = []
-
-                            auroc[filename].append(value)
 
                         if match.group(1) == "queried_instances":
                             # Anomalies seen
@@ -126,11 +107,6 @@ def main(datasets, algorithms):
                     logging.info("Calculating mean (...) of seen anomalies")
                     data = collect_data(anomalies_seen)
                     calc_mean(data, os.path.join(metrics_dir, f"anomalies_seen.csv"))
-
-                if any(auroc):
-                    logging.info("Calculating mean (...) of AUROC")
-                    data = collect_data(auroc)
-                    calc_mean(data, os.path.join(metrics_dir, f"auroc.csv"))
 
                 if not any(anomalies_seen):
                     logging.warning(

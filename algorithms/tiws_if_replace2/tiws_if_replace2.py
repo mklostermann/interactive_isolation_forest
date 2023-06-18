@@ -8,6 +8,7 @@ import matplotlib.pylab as plt
 
 import helper
 
+
 # TiWS-iForest applied to IAD with replacement of the removed trees AFTER evaluation.
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
@@ -22,7 +23,6 @@ def detect(datasets, budget, runs):
         data, labels = helper.load_dataset(data_file)
 
         for run in range(1, runs + 1):
-            all_scores=np.zeros(shape=(actual_budget, dataset_info.samples_count))
             queried_instances = []
 
             # Following code is mainly from weakly_supervised_algo()
@@ -120,11 +120,8 @@ def detect(datasets, budget, runs):
                         tiws_IF.estimators_features_.extend(new_IF.estimators_features_)
                         tiws_IF.n_estimators = sk_IF.n_estimators
 
-
-                all_scores[i, :] = scores
                 queried_instances.append(queried)
 
-            helper.save_all_scores(all_scores, results_dir, data_file, run)
             helper.save_queried_instances(queried_instances, results_dir, data_file, run)
 
 

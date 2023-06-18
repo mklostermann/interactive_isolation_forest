@@ -7,27 +7,6 @@ import pandas as pd
 import helper
 
 
-def plot_auroc(dataset, algorithm_result_file, output_file):
-    fig, ax = plt.subplots()
-
-    i = 0
-    for (algorithm, result_file) in algorithm_result_file:
-        dataframe = pd.read_csv(result_file, header=None)
-        data = dataframe.to_numpy(dtype=float)
-
-        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3,
-                    errorevery=(i, len(algorithm_result_file)))
-        i = i + 1
-
-    ax.set_xlabel('Iterations')
-    ax.set_ylabel('ROC AUC')
-    ax.set_title(dataset.upper())
-    ax.legend()
-
-    fig.savefig(output_file, format='pdf', bbox_inches='tight')
-    plt.close(fig)
-
-
 def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
     fig, ax = plt.subplots()
 
@@ -35,7 +14,8 @@ def plot_anomalies_seen(dataset, algorithm_result_file, output_file):
     for (algorithm, result_file) in algorithm_result_file:
         dataframe = pd.read_csv(result_file, header=None)
         data = dataframe.to_numpy(dtype=float)
-        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3, # TODO: Assign same label as the algorithm is referenced in my thesis (e.g. iforest_skelarn -> IF, if_aad -> IF-AAD)
+        #  TODO: Assign same label as the algorithm is referenced in my thesis (e.g. iforest_skelarn -> IF...)
+        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=algorithm, alpha=0.8, elinewidth=0.5, capsize=3,
                     errorevery=(i, len(algorithm_result_file)))
         i = i + 1
 
@@ -56,16 +36,8 @@ def main(datasets, algorithms):
     logging.info(f"Creating plots for data sets {datasets} and algorithms {algorithms}")
     logging.info("==========")
 
-    # TODO: Remove stuff to handle variants (configurable)
-    variants = ["all", "le05", "le10", "le20", "orig", "02", "05", "10", "20"]
-
     for dataset in datasets:
         logging.info(f"Creating plots for {dataset}")
-
-        name = "auroc"
-        algorithm_result_file = helper.get_metrics_files_for_algorithms(dataset, algorithms, f"{name}.csv")
-        if any(algorithm_result_file):
-            plot_auroc(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
 
         name = "anomalies_seen"
         algorithm_result_file = helper.get_metrics_files_for_algorithms(dataset, algorithms, f"{name}.csv")

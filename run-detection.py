@@ -9,6 +9,8 @@ import algorithms.iif_v6.iif_v6
 import algorithms.iforest_aad.iforest_aad
 import algorithms.iforest_sklearn.iforest_sklearn
 import algorithms.tiws_if.tiws_if
+import algorithms.tiws_if_replace1.tiws_if_replace1
+import algorithms.tiws_if_replace2.tiws_if_replace2
 import algorithms.omd.omd
 import threading
 import time
@@ -39,6 +41,10 @@ class DetectorThread(threading.Thread):
             algorithms.iforest_sklearn.iforest_sklearn.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "tiws_if":
             algorithms.tiws_if.tiws_if.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "tiws_if_replace1":
+            algorithms.tiws_if_replace1.tiws_if_replace1.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "tiws_if_replace2":
+            algorithms.tiws_if_replace2.tiws_if_replace2.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "omd":
             algorithms.omd.omd.detect(self.args.datasets, self.args.budget, self.args.runs)
         else:

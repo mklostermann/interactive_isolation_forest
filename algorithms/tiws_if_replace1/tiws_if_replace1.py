@@ -8,11 +8,11 @@ import matplotlib.pylab as plt
 
 import helper
 
-# TiWS-iForest applied to IAD (creates TiWS-iForest in each iteration, using the initially trained IF)
+# TiWS-iForest applied to IAD with replacement of the removed trees BEFORE evaluation.
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if_replace1")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -63,7 +63,7 @@ def detect(datasets, budget, runs):
                     # ap_forest_test         : collection of average precision of each tree in the forests obtained with the learned ordering
 
                     # train anomaly scores
-                    _, tree_supervised = compute_tree_anomaly_scores(sk_IF,
+                    _, tree_supervised = compute_tree_anomaly_scores(tiws_IF,
                                                                      supervised_data)
 
                     # average precision of trees on the supervised dataset
@@ -102,9 +102,15 @@ def detect(datasets, budget, runs):
                     # - Evaluate scores and query anomaly
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
                     tiws_indices = learned_ordering[0:n_trees]
-                    tiws_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
-                    tiws_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
-                    tiws_IF.n_estimators = n_trees
+                    tiws_IF.estimators_ = list(np.array(tiws_IF.estimators_)[tiws_indices])
+                    tiws_IF.estimators_features_ = list(np.array(tiws_IF.estimators_features_)[tiws_indices])
+
+                    # MKL: Tree replacement
+                    n_replaced_trees = sk_IF.n_estimators - n_trees
+                    if n_replaced_trees > 0:
+                        new_IF = IsolationForest(n_estimators=n_replaced_trees, max_samples=256).fit(data)
+                        tiws_IF.estimators_.extend(new_IF.estimators_)
+                        tiws_IF.estimators_features_.extend(new_IF.estimators_features_)
 
                     scores = -tiws_IF.score_samples(data)
                     for j in range(0, dataset_info.samples_count + 1):

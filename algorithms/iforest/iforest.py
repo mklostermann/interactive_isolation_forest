@@ -7,7 +7,7 @@ import helper
 # Isolation Forest from scikit-learn
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "iforest_sklearn")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "iforest")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)

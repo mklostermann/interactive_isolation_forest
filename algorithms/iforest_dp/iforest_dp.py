@@ -4,11 +4,10 @@ from sklearn.ensemble import IsolationForest
 
 import helper
 
-# IIF version 1
-# Unsupervised IF with data pruning.
+# Unsupervised IF with data pruning (train trees only on unlabeled and anomalous data).
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "iif_v1")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "iforest_dp")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)

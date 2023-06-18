@@ -55,7 +55,8 @@ def main(datasets, algorithms):
                 os.makedirs(metrics_dir)
 
             if os.path.exists(results_dir):
-                anomalies_seen = {}
+                all_anomalies_seen = {}
+                all_precision = {}
 
                 for file in os.scandir(results_dir):
                     match = re.search(r"\A(queried_instances)-(\w+)#(\d+)\.csv\Z", file.name)
@@ -70,45 +71,52 @@ def main(datasets, algorithms):
                         if match.group(1) == "queried_instances":
                             # Anomalies seen
                             queried_instances = np.loadtxt(file.path, delimiter=',', dtype=int)
-                            value = np.concatenate(([0], np.cumsum(labels[filename][queried_instances])))
-                            np.savetxt(os.path.join(metrics_dir, f"anomalies_seen-{filename}#{match.group(3)}.csv"), value, fmt='%d', delimiter=',')
+                            anomalies_seen = np.concatenate(([0], np.cumsum(labels[filename][queried_instances])))
+                            np.savetxt(os.path.join(metrics_dir, f"anomalies_seen-{filename}#{match.group(3)}.csv"), anomalies_seen, fmt='%d', delimiter=',')
 
-                            if filename not in anomalies_seen:
-                                anomalies_seen[filename] = []
+                            if filename not in all_anomalies_seen:
+                                all_anomalies_seen[filename] = []
 
-                            anomalies_seen[filename].append(value)
+                            all_anomalies_seen[filename].append(anomalies_seen)
 
-                            # TODO: Add metric (or not?)
-                            # P@n (n = |O|)
-                            # info = next(info for info in dataset_infos if info.filename == filename)
-                            # if anomalies_seen.size > info.outlier_count:
-                            #     precision_n = anomalies_seen[info.outlier_count] / info.outlier_count
-                            #     adjusted_precision_n = (precision_n - (info.outlier_count / info.samples_count))\
-                            #                            / (1 - (info.outlier_count / info.samples_count))
-                            #     average_precision = sum([(anomalies_seen[i] / i) for i in range(1, info.outlier_count + 1)]) / info.outlier_count
-                            #     adjusted_average_precision = (average_precision - (info.outlier_count / info.samples_count))\
-                            #                                  / (1 - (info.outlier_count / info.samples_count))
-                            #
-                            #     np.savetxt(os.path.join(metrics_dir, f"precision-{filename}#{match.group(3)}.csv"),
-                            #                [precision_n, adjusted_precision_n, average_precision, adjusted_average_precision], delimiter=',')
+                            # P@n
+                            # Start with one to omit NaN for iteration 0
+                            iter_n = np.concatenate(([1], np.arange(1, anomalies_seen.shape[0])))
+                            precision = anomalies_seen / iter_n
 
-                            # R@n (n = |O|)
+                            if filename not in all_precision:
+                                all_precision[filename] = []
+
+                            all_precision[filename].append(precision)
                     elif file.name.__contains__("omd_summary_feed_"):  # Special handling for OMD
                         omd_anomalies_seen = np.loadtxt(file.path, delimiter=',', dtype=int, skiprows=1)
 
                         filename = file.name  # TODO: supply dataset file name, e.g. yeast
-                        anomalies_seen[filename] = []
+                        all_anomalies_seen[filename] = []
+                        all_precision[filename] = []
                         for i in range(0, omd_anomalies_seen.shape[0]):
-                            anomalies_seen[filename].append(omd_anomalies_seen[i][1:])  # Skip first element (iter)
+                            anomalies_seen = np.concatenate(([0], omd_anomalies_seen[i][1:])) # Skip first element (iter)
+                            all_anomalies_seen[filename].append(anomalies_seen)
+
+                            # P@n
+                            # Start with one to omit NaN for iteration 0
+                            iter_n = np.concatenate(([1], np.arange(1, anomalies_seen.shape[0])))
+                            precision = anomalies_seen / iter_n
+                            all_precision[filename].append(precision)
                     else:
                         logging.info(f"File {file.path} is ignored")
 
-                if any(anomalies_seen):
+                if any(all_anomalies_seen):
                     logging.info("Calculating mean (...) of seen anomalies")
-                    data = collect_data(anomalies_seen)
+                    data = collect_data(all_anomalies_seen)
                     calc_mean(data, os.path.join(metrics_dir, f"anomalies_seen.csv"))
 
-                if not any(anomalies_seen):
+                if any(all_precision):
+                    logging.info("Calculating mean (...) of precision@n")
+                    data = collect_data(all_precision)
+                    calc_mean(data, os.path.join(metrics_dir, f"precision.csv"))
+
+                if not any(all_anomalies_seen):
                     logging.warning(
                         f"No files to calculate mean of seen anomalies for {dataset}/{algorithm}")
             else:

@@ -33,8 +33,9 @@ Folder structure: results/DATASET/ALGORITHM
 ### Calculated Metrics
 Using the results, following metrics are calculated:
 * anomalies_seen-DATA_FILE#RUN.csv: Each line contains the number of anomalies seen of the run.
-* anomalies_seen-DATA_FILE.csv: Each line contains the number of anomalies seen averaged over all runs on the data file and the values for the standard deviation.
-* anomalies_seen.csv: Each line contains the number of anomalies seen averaged over all runs on all data files and the values for the standard deviation.
+* anomalies_seen-DATA_FILE.csv: Each line contains the number of anomalies seen averaged over all runs on the data file and the values for the confidence interval.
+* anomalies_seen.csv: Each line contains the number of anomalies seen averaged over all runs on all data files and the values for the values for the confidence interval.
+* precision.csv: Each line contains the average precision@n
 
 
 Metrics are calculated using the script `calc_metrics.py [DATASETS] [ALGORITHMS]`

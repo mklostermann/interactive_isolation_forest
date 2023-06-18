@@ -1,3 +1,4 @@
+import copy
 import os
 import numpy as np
 from sklearn.ensemble import IsolationForest
@@ -27,17 +28,20 @@ def detect(datasets, budget, runs):
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.
 
-            for i in range(0, actual_budget):
-                # UNSUPERVISED TRAIN --------------------------------------------------------------
+            # UNSUPERVISED TRAIN --------------------------------------------------------------
 
-                # unsupervised train on the full train_data
-                # the weakly supervised train will be performed only on supervised_data
-                # sk_IF is the standard sklearn Isolation Forest
-                sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
+            # unsupervised train on the full train_data
+            # the weakly supervised train will be performed only on supervised_data
+            # sk_IF is the standard sklearn Isolation Forest
+            sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
+            # Initialize a second forest, which will be used to evaluate the TiWS-iForest.
+            # Not very elegant, but an easy way to evaluate the forest later on.
+            tiws_IF = copy.deepcopy(sk_IF)
+            for i in range(0, actual_budget):
 
                 if i == 0:
                     # Initially, we only have a plain isolation forest; inversion required, as it returns the "opposite
-                    # of the anomaly score defined in the original paper" TODO: Verify if this is still true!?
+                    # of the anomaly score defined in the original paper"
                     scores = -sk_IF.score_samples(data)
                     queried = np.argsort(-scores)[0]
                 else:
@@ -98,11 +102,11 @@ def detect(datasets, budget, runs):
                     # - Evaluate scores and query anomaly
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
                     tiws_indices = learned_ordering[0:n_trees]
-                    sk_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
-                    sk_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
-                    sk_IF.n_estimators = n_trees
+                    tiws_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
+                    tiws_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
+                    tiws_IF.n_estimators = n_trees
 
-                    scores = -sk_IF.score_samples(data)
+                    scores = -tiws_IF.score_samples(data)
                     for j in range(0, dataset_info.samples_count + 1):
                         queried = np.argsort(-scores)[j]
                         if queried not in queried_instances:

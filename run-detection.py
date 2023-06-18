@@ -1,11 +1,11 @@
 import argparse
 import helper
 import algorithms.iif_v1.iif_v1
-import algorithms.iif_v1_1.iif_v1_1
 import algorithms.iif_v2.iif_v2
 import algorithms.iif_v3.iif_v3
 import algorithms.iif_v4.iif_v4
 import algorithms.iif_v5.iif_v5
+import algorithms.iif_v6.iif_v6
 import algorithms.iforest_aad.iforest_aad
 import algorithms.iforest_sklearn.iforest_sklearn
 import algorithms.tiws_if.tiws_if
@@ -23,8 +23,6 @@ class DetectorThread(threading.Thread):
     def run(self):
         if self.algorithm == "iif_v1":
             algorithms.iif_v1.iif_v1.detect(self.args.datasets, self.args.budget, self.args.runs)
-        elif self.algorithm == "iif_v1_1":
-            algorithms.iif_v1_1.iif_v1_1.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iif_v2":
             algorithms.iif_v2.iif_v2.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iif_v3":
@@ -33,6 +31,8 @@ class DetectorThread(threading.Thread):
             algorithms.iif_v4.iif_v4.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iif_v5":
             algorithms.iif_v5.iif_v5.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "iif_v6":
+            algorithms.iif_v6.iif_v6.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_aad":
             algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_sklearn":

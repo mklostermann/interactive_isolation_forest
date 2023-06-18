@@ -7,12 +7,12 @@ import matplotlib.pylab as plt
 
 import helper
 
-# IIF version 1
-# Basically an incremental TiWS-iForest (incremental update of initial IF).
+# IIF version 6 (simply replace trees dropped by TiWS (model pruning),
+# but new trees are trained without anomalies (data pruning)); similar to version 2 (and 3)
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "iif_v1_1")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "iif_v6")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -57,6 +57,13 @@ def detect(datasets, budget, runs):
                     # sorted_tree_test       : tree_test sorted according to learned_ordering
                     # ap_forest_test         : collection of average precision of each tree in the forests obtained with the learned ordering
 
+                    # MKL: We need to shuffle the trees first, otherwise if there are  equally bad trees, always the
+                    # newest would be removed. This should improve as ass bad trees are replaced regularly (by chance).
+                    shuffled_indices = np.arange(sk_IF.n_estimators)
+                    np.random.shuffle(shuffled_indices)
+                    sk_IF.estimators_ = np.array(sk_IF.estimators_)[shuffled_indices]
+                    sk_IF.estimators_features_ = np.array(sk_IF.estimators_)[shuffled_indices]
+
                     # train anomaly scores
                     _, tree_supervised = compute_tree_anomaly_scores(sk_IF,
                                                                      supervised_data)
@@ -96,10 +103,20 @@ def detect(datasets, budget, runs):
                     # - Create the TiWS-iForest by using the trees for a new forest
                     # - Evaluate scores and query anomaly
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
-                    tiws_indices = learned_ordering[0:n_trees]
-                    sk_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
-                    sk_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
-                    sk_IF.n_estimators = n_trees
+
+                    if n_trees < sk_IF.n_estimators:
+                        tiws_indices = learned_ordering[0:n_trees]
+
+                        # Create new trees as replacement for dropped ones using pruned data
+                        n_samples = data.shape[0]
+                        # Keep if label is unknown or proved to be no anomaly
+                        pruned_data_indices = [i for i in range(n_samples)
+                                               if (i not in queried_instances or labels[i] == 0)]
+                        new_if = IsolationForest(n_estimators=sk_IF.n_estimators - n_trees, max_samples=256).fit(data[pruned_data_indices])
+                        sk_IF.estimators_ = list(np.array(sk_IF.estimators_)[tiws_indices])
+                        sk_IF.estimators_.extend(new_if.estimators_)
+                        sk_IF.estimators_features_ = list(np.array(sk_IF.estimators_features_)[tiws_indices])
+                        sk_IF.estimators_features_.extend(new_if.estimators_features_)
 
                     scores = -sk_IF.score_samples(data)
                     for j in range(0, dataset_info.samples_count + 1):

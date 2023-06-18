@@ -42,7 +42,7 @@ def main(datasets, algorithms):
         name = "anomalies_seen"
         algorithm_result_file = helper.get_metrics_files_for_algorithms(dataset, algorithms, f"{name}.csv")
         if any(algorithm_result_file):
-            plot_anomalies_seen(dataset, algorithm_result_file, helper.get_plot_file(dataset, name))
+            plot_anomalies_seen(dataset, algorithm_result_file, helper.get_plot_file(dataset, algorithms, name))
 
     logging.info("==========")
     logging.info("Finished")

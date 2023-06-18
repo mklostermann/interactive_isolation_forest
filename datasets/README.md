@@ -3,5 +3,5 @@ From https://github.com/shubhomoydas/ad_examples/tree/master/ad_examples/dataset
 
 \cite{das-incorporating_feedback_into_tree-based_anomaly_detection}
 
-Larger datasets were sub-sampled (*_sub), see paper for details about the construction.
+Larger datasets were sub-sampled (*_sub), see paper for details about the construction. These datasets wer not used.
 

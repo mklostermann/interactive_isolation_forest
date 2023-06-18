@@ -111,8 +111,8 @@ def get_metrics_dir(dataset, algorithm=None):
     return os.path.abspath(os.path.join(os.getcwd(), f"metrics/{dataset}/{'' if algorithm is None else algorithm}"))
 
 
-def get_plot_file(dataset, plotname):
-    return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{plotname}.pdf"))
+def get_plot_file(dataset, algorithms, plotname):
+    return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{'_'.join(algorithms)}-{plotname}.pdf"))
 
 
 def get_metrics_files_for_algorithms(dataset, algorithms, name):

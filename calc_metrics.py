@@ -19,8 +19,13 @@ def calc_mean(data, output_file):
     npdata = np.array(data)
     for i in range(0, npdata.shape[1]):  # For every iteration of all runs
         iter_data = npdata[:, i]
-        ci = st.norm.interval(confidence=0.95, loc=mean[i], scale=st.sem(iter_data))
-        cidev.append(ci[1] - ci[0])
+        stderr = st.sem(iter_data)
+        if stderr == 0:
+            cidev.append(0)
+        else:
+            ci = st.norm.interval(confidence=0.95, loc=mean[i], scale=stderr)
+            cidev.append(ci[1] - ci[0])
+
     np.savetxt(output_file, np.array([mean, cidev]), delimiter=',')
 
 

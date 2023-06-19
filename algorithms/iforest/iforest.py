@@ -16,18 +16,10 @@ def detect(datasets, budget, runs):
         data, labels = helper.load_dataset(data_file)
 
         for run in range(1, runs + 1):
-            queried_instances = []
+            iforest = IsolationForest(n_estimators=100, max_samples=256).fit(data)
 
-            for i in range(0, actual_budget):
-                iforest = IsolationForest(n_estimators=100, max_samples=256).fit(data)
+            # Inversion required, as it returns the "opposite of the anomaly score defined in the original paper"
+            scores = -iforest.score_samples(data)
 
-                # Inversion required, as it returns the "opposite of the anomaly score defined in the original paper"
-                scores = -iforest.score_samples(data)
-                for j in range(0, dataset_info.samples_count):
-                    queried = np.argsort(-scores)[j]
-                    if queried not in queried_instances:
-                        break
-
-                queried_instances.append(queried)
-
+            queried_instances = np.argsort(-scores)[np.arange(actual_budget)]
             helper.save_queried_instances(queried_instances, results_dir, data_file, run)

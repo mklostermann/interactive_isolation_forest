@@ -26,7 +26,7 @@ def detect(datasets, budget, runs):
 
                 # Inversion required, as it returns the "opposite of the anomaly score defined in the original paper"
                 scores = -iforest.score_samples(data)
-                for j in range(0, dataset_info.samples_count + 1):
+                for j in range(0, dataset_info.samples_count):
                     queried = np.argsort(-scores)[j]
                     if queried not in queried_instances:
                         break

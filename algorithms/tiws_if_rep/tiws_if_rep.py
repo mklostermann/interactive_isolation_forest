@@ -8,11 +8,11 @@ import matplotlib.pylab as plt
 
 import helper
 
-# TiWS-iForest applied to IAD (creates TiWS-iForest in each iteration, using the initially trained IF)
+# TiWS-iForest applied to IAD, repeatedly trained (creates TiWS-iForest in each iteration, using a new IF)
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if_rep")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -27,17 +27,16 @@ def detect(datasets, budget, runs):
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.
 
-            # UNSUPERVISED TRAIN --------------------------------------------------------------
-
-            # unsupervised train on the full train_data
-            # the weakly supervised train will be performed only on supervised_data
-            # sk_IF is the standard sklearn Isolation Forest
-            sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
-            # Initialize a second forest, which will be used to evaluate the TiWS-iForest.
-            # Not very elegant, but an easy way to evaluate the forest later on.
-            tiws_IF = copy.deepcopy(sk_IF)
-
             for i in range(0, actual_budget):
+                # UNSUPERVISED TRAIN --------------------------------------------------------------
+
+                # unsupervised train on the full train_data
+                # the weakly supervised train will be performed only on supervised_data
+                # sk_IF is the standard sklearn Isolation Forest
+                sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
+                # Initialize a second forest, which will be used to evaluate the TiWS-iForest.
+                # Not very elegant, but an easy way to evaluate the forest later on.
+                tiws_IF = copy.deepcopy(sk_IF)
 
                 if i == 0:
                     # Initially, we only have a plain isolation forest; inversion required, as it returns the "opposite

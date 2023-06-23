@@ -1,6 +1,6 @@
 import argparse
 import helper
-import algorithms.iforest_dp.iforest_dp
+import algorithms.iforest_rep_dp.iforest_rep_dp
 import algorithms.iif.iif
 import algorithms.iforest_aad.iforest_aad
 import algorithms.iforest.iforest
@@ -19,7 +19,7 @@ class DetectorThread(threading.Thread):
         self.args = args
 
     def run(self):
-        if self.algorithm == "iforest_dp":
+        if self.algorithm == "iforest_rep_dp":
             algorithms.iforest_dp.iforest_dp.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iif":
             algorithms.iif.iif.detect(self.args.datasets, self.args.budget, self.args.runs)

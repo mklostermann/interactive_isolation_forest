@@ -23,13 +23,15 @@ def get_label(algorithm):
         return "OMD"
     elif algorithm == "iforest_aad":
         return "IF-AAD"
+    elif algorithm == "tiws_if_replace2":
+        return "TIWS-OTR"
     else:
         return algorithm
 
 def get_color(algorithm):
     # Default cycle: tab:blue, tab:orange, tab:green, tab:red, tab:purple, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
     if algorithm == "iforest":
-        return "tab:cyan"
+        return "tab:gray"
     elif algorithm == "iforest_rep":
         return "tab:blue"
     elif algorithm == "iforest_rep_dp":
@@ -44,7 +46,8 @@ def get_color(algorithm):
         return "tab:green"
     elif algorithm == "iforest_aad":
         return "tab:purple"
-        # Weitere gute Farben: "tab:yellow", "tab:cyan"
+    elif algorithm == "tiws_if_replace2":
+        return "tab:yellow"
     else:
         return "magenta"
 

@@ -131,3 +131,11 @@ def get_filename(path):
 def save_queried_instances(queried_instances, results_dir, data_file, run):
     queried_file = os.path.join(results_dir, f"queried_instances-{get_filename(data_file)}#{run}.csv")
     np.savetxt(queried_file, queried_instances, fmt="%d", delimiter=",")
+
+def save_active_trees(active_trees, results_dir, data_file, run):
+    file = os.path.join(results_dir, f"active_trees-{get_filename(data_file)}#{run}.csv")
+    np.savetxt(file, active_trees, fmt="%d", delimiter=",")
+
+def save_trained_trees(trained_trees, results_dir, data_file, run):
+    file = os.path.join(results_dir, f"trained_trees-{get_filename(data_file)}#{run}.csv")
+    np.savetxt(file, trained_trees, fmt="%d", delimiter=",")

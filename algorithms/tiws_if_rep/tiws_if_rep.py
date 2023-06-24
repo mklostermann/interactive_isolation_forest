@@ -23,6 +23,8 @@ def detect(datasets, budget, runs):
 
         for run in range(1, runs + 1):
             queried_instances = []
+            active_trees = [0] # Plots start at iteration 0
+            trained_trees = [0]
 
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.
@@ -34,6 +36,7 @@ def detect(datasets, budget, runs):
                 # the weakly supervised train will be performed only on supervised_data
                 # sk_IF is the standard sklearn Isolation Forest
                 sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
+                trained_trees.append(100)
                 # Initialize a second forest, which will be used to evaluate the TiWS-iForest.
                 # Not very elegant, but an easy way to evaluate the forest later on.
                 tiws_IF = copy.deepcopy(sk_IF)
@@ -41,6 +44,7 @@ def detect(datasets, budget, runs):
                 if i == 0:
                     # Initially, we only have a plain isolation forest; inversion required, as it returns the "opposite
                     # of the anomaly score defined in the original paper"
+                    active_trees.append(100)
                     scores = -sk_IF.score_samples(data)
                     queried = np.argsort(-scores)[0]
                 else:
@@ -100,6 +104,7 @@ def detect(datasets, budget, runs):
                     # - Create the TiWS-iForest by using the trees for a new forest
                     # - Evaluate scores and query anomaly
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
+                    active_trees.append(n_trees)
                     tiws_indices = learned_ordering[0:n_trees]
                     tiws_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
                     tiws_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
@@ -114,6 +119,8 @@ def detect(datasets, budget, runs):
                 queried_instances.append(queried)
 
             helper.save_queried_instances(queried_instances, results_dir, data_file, run)
+            helper.save_active_trees(active_trees, results_dir, data_file, run)
+            helper.save_trained_trees(trained_trees, results_dir, data_file, run)
 
 
 # Unmodified original source from weakly_supervised.ipynb

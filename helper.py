@@ -112,7 +112,9 @@ def get_metrics_dir(dataset, algorithm=None):
 
 
 def get_plot_file(dataset, algorithms, plotname):
-    return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{'_'.join(algorithms)}-{plotname}.pdf"))
+    sorted_algorithms = algorithms.copy()
+    sorted_algorithms.sort()
+    return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{'_'.join(sorted_algorithms)}-{plotname}.pdf"))
 
 
 def get_metrics_files_for_algorithms(dataset, algorithms, name):

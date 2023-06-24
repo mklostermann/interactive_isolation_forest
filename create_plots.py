@@ -33,6 +33,7 @@ def main(datasets, algorithms):
     logging.basicConfig(filename="log/create_plots.log", filemode='w',
                         format='%(asctime)s [%(threadName)s] %(message)s', level=logging.INFO)
     logging.info("==========")
+    algorithms.sort()
     logging.info(f"Creating plots for data sets {datasets} and algorithms {algorithms}")
     logging.info("==========")
 

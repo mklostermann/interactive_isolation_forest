@@ -7,47 +7,46 @@ import pandas as pd
 import helper
 
 def get_label(algorithm):
-    match algorithm:
-        case "iforest":
-            return "IF-OT"
-        case "iforest_rep":
+    if algorithm == "iforest":
+        return "IF-OT"
+    elif algorithm == "iforest_rep":
             return "IF"
-        case "iforest_rep_dp":
-            return "IF-DP"
-        case "tiws_if":
-            return "TIWS-OT"
-        case "tiws_if_rep":
-            return "TIWS"
-        case "iif":
-            return "IIF"
-        case "omd":
-            return "OMD"
-        case "iforest_aad":
-            return "IF-AAD"
-        case _:
-            return algorithm
+    elif algorithm == "iforest_rep_dp":
+        return "IF-DP"
+    elif algorithm == "tiws_if":
+        return "TIWS-OT"
+    elif algorithm == "tiws_if_rep":
+        return "TIWS"
+    elif algorithm == "iif":
+        return "IIF"
+    elif algorithm == "omd":
+        return "OMD"
+    elif algorithm == "iforest_aad":
+        return "IF-AAD"
+    else:
+        return algorithm
+
 def get_color(algorithm):
     # Default cycle: tab:blue, tab:orange, tab:green, tab:red, tab:purple, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
-    match algorithm:
-        case "iforest":
-            return "tab:cyan"
-        case "iforest_rep":
-            return "tab:blue"
-        case "iforest_rep_dp":
-            return "tab:pink"
-        case "tiws_if":
-            return "tab:brown"
-        case "tiws_if_rep":
-            return "tab:orange"
-        case "iif":
-            return "tab:red"
-        case "omd":
-            return "tab:green"
-        case "iforest_aad":
-            return "tab:purple"
+    if algorithm == "iforest":
+        return "tab:cyan"
+    elif algorithm == "iforest_rep":
+        return "tab:blue"
+    elif algorithm == "iforest_rep_dp":
+        return "tab:pink"
+    elif algorithm == "tiws_if":
+        return "tab:brown"
+    elif algorithm == "tiws_if_rep":
+        return "tab:orange"
+    elif algorithm == "iif":
+        return "tab:red"
+    elif algorithm == "omd":
+        return "tab:green"
+    elif algorithm == "iforest_aad":
+        return "tab:purple"
         # Weitere gute Farben: "tab:yellow", "tab:cyan"
-        case _:
-            return "magenta"
+    else:
+        return "magenta"
 
 
 def plot_anomalies_seen(dataset, algorithms, algorithm_result_file, output_file):

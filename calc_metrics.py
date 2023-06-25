@@ -62,9 +62,11 @@ def main(datasets, algorithms):
             if os.path.exists(results_dir):
                 all_anomalies_seen = {}
                 all_precision = {}
+                all_active_trees = {}
+                all_trained_trees = {}
 
                 for file in os.scandir(results_dir):
-                    match = re.search(r"\A(queried_instances)-(\w+)#(\d+)\.csv\Z", file.name)
+                    match = re.search(r"\A(queried_instances|active_trees|trained_trees)-(\w+)#(\d+)\.csv\Z", file.name)
                     if match is not None:
                         logging.info(f"Calculating metrics for file {file.path}")
                         filename = match.group(2)
@@ -93,6 +95,19 @@ def main(datasets, algorithms):
                                 all_precision[filename] = []
 
                             all_precision[filename].append(precision)
+                        if match.group(1) == "active_trees":
+                            active_trees = np.loadtxt(file.path, delimiter=',', dtype=int)
+                            if filename not in all_active_trees:
+                                all_active_trees[filename] = []
+
+                            all_active_trees[filename].append(active_trees)
+                        if match.group(1) == "trained_trees":
+                            trained_trees = np.loadtxt(file.path, delimiter=',', dtype=int)
+                            if filename not in all_trained_trees:
+                                all_trained_trees[filename] = []
+
+                            all_trained_trees[filename].append(trained_trees)
+
                     elif file.name.__contains__("omd_summary_feed_"):  # Special handling for OMD
                         omd_anomalies_seen = np.loadtxt(file.path, delimiter=',', dtype=int, skiprows=1)
 
@@ -120,6 +135,16 @@ def main(datasets, algorithms):
                     logging.info("Calculating mean (...) of precision@n")
                     data = collect_data(all_precision)
                     calc_mean(data, os.path.join(metrics_dir, f"precision.csv"))
+
+                if any(all_active_trees):
+                    logging.info("Calculating mean (...) of active trees")
+                    data = collect_data(all_active_trees)
+                    calc_mean(data, os.path.join(metrics_dir, f"active_trees.csv"))
+
+                if any(all_trained_trees):
+                    logging.info("Calculating mean (...) of trained trees")
+                    data = collect_data(all_trained_trees)
+                    calc_mean(data, os.path.join(metrics_dir, f"trained_trees.csv"))
 
                 if not any(all_anomalies_seen):
                     logging.warning(

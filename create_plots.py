@@ -73,6 +73,27 @@ def plot_anomalies_seen(dataset, algorithms, algorithm_result_file, output_file)
     fig.savefig(output_file, format='pdf', bbox_inches='tight')
     plt.close(fig)
 
+def plot_active_trees(dataset, algorithms, algorithm_result_file, output_file):
+    fig, ax = plt.subplots()
+    ax.set_prop_cycle("color", map(get_color, algorithms))
+
+    i = 0
+    for (algorithm, result_file) in algorithm_result_file:
+        dataframe = pd.read_csv(result_file, header=None)
+        data = dataframe.to_numpy(dtype=float)
+        ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=get_label(algorithm), alpha=0.8, elinewidth=0.5, capsize=3,
+                    errorevery=(i, len(algorithm_result_file)))
+        i = i + 1
+
+    ax.set_xlabel('Number of Iterations')
+    ax.set_ylabel('Forest Size')
+    # TODO: Set scale? ax.set_ylim([0, data.shape[1]])
+    # No title as I am using captions: ax.set_title(dataset.upper())
+    ax.legend()
+
+    fig.savefig(output_file, format='pdf', bbox_inches='tight')
+    plt.close(fig)
+
 
 def main(datasets, algorithms):
     logging.basicConfig(filename="log/create_plots.log", filemode='w',
@@ -90,6 +111,13 @@ def main(datasets, algorithms):
         if any(algorithm_result_file):
             plot_anomalies_seen(dataset, present_algorithms, algorithm_result_file,
                                 helper.get_plot_file(dataset, present_algorithms, name))
+
+        name = "active_trees"
+        algorithm_result_file = helper.get_metrics_files_for_algorithms(dataset, algorithms, f"{name}.csv")
+        present_algorithms = [i[0] for i in algorithm_result_file]
+        if any(algorithm_result_file):
+            plot_active_trees(dataset, present_algorithms, algorithm_result_file,
+                              helper.get_plot_file(dataset, present_algorithms, name))
 
     logging.info("==========")
     logging.info("Finished")

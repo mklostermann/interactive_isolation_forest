@@ -47,7 +47,7 @@ def get_color(algorithm):
     elif algorithm == "iforest_aad":
         return "tab:purple"
     elif algorithm == "tiws_if_replace2":
-        return "tab:yellow"
+        return "tab:olive"
     else:
         return "magenta"
 

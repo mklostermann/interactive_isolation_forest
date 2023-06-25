@@ -2,6 +2,7 @@ import argparse
 
 import logging
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 import helper
@@ -85,6 +86,7 @@ def plot_active_trees(dataset, algorithms, algorithm_result_file, output_file):
     for (algorithm, result_file) in algorithm_result_file:
         dataframe = pd.read_csv(result_file, header=None)
         data = dataframe.to_numpy(dtype=float)
+        data[:, 0] = np.nan # Skip first value, there is no tree at iteration 0
         ax.errorbar(range(data.shape[1]), data[0], yerr=data[1], label=get_label(algorithm), alpha=0.8, elinewidth=0.5, capsize=3,
                     errorevery=(i, len(algorithm_result_file)))
         i = i + 1

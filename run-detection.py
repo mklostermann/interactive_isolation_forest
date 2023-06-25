@@ -5,7 +5,7 @@ import algorithms.iforest_rep.iforest_rep
 import algorithms.iforest_rep_dp.iforest_rep_dp
 import algorithms.tiws_if.tiws_if
 import algorithms.tiws_if_rep.tiws_if_rep
-import algorithms.iif.iif
+import algorithms.tiws_if_replace2_fp.tiws_if_replace2_fp
 import algorithms.iforest_aad.iforest_aad
 import algorithms.tiws_if_replace1.tiws_if_replace1
 import algorithms.tiws_if_replace2.tiws_if_replace2
@@ -38,8 +38,8 @@ class DetectorThread(threading.Thread):
             algorithms.tiws_if_replace2.tiws_if_replace2.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "tiws_if_replace2_dp":
             algorithms.tiws_if_replace2_dp.tiws_if_replace2_dp.detect(self.args.datasets, self.args.budget, self.args.runs)
-        elif self.algorithm == "iif":
-            algorithms.iif.iif.detect(self.args.datasets, self.args.budget, self.args.runs)
+        elif self.algorithm == "tiws_if_replace2_fp":
+            algorithms.tiws_if_replace2_fp.tiws_if_replace2_fp.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "iforest_aad":
             algorithms.iforest_aad.iforest_aad.detect(self.args.datasets, self.args.budget, self.args.runs)
         elif self.algorithm == "omd":

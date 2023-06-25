@@ -18,8 +18,8 @@ def get_label(algorithm):
         return "TIWS-OT"
     elif algorithm == "tiws_if_rep":
         return "TIWS"
-    elif algorithm == "iif":
-        return "IIF"
+    elif algorithm == "tiws_if_replace2_fp":
+        return "TIWS-OTR-FP"
     elif algorithm == "omd":
         return "OMD"
     elif algorithm == "iforest_aad":
@@ -27,7 +27,7 @@ def get_label(algorithm):
     elif algorithm == "tiws_if_replace2":
         return "TIWS-OTR"
     elif algorithm == "tiws_if_replace2_dp":
-        return "TIWS-OTR-DP"
+        return "TIWS-OTR-DP (IIF)"
     else:
         return algorithm
 
@@ -43,8 +43,8 @@ def get_color(algorithm):
         return "tab:brown"
     elif algorithm == "tiws_if_rep":
         return "tab:orange"
-    elif algorithm == "iif":
-        return "tab:red"
+    elif algorithm == "tiws_if_replace2_fp":
+        return "tab:gray"
     elif algorithm == "omd":
         return "tab:green"
     elif algorithm == "iforest_aad":
@@ -52,7 +52,7 @@ def get_color(algorithm):
     elif algorithm == "tiws_if_replace2":
         return "tab:brown"
     elif algorithm == "tiws_if_replace2_dp":
-        return "tab:gray"
+        return "tab:red"
     else:
         return "magenta"
 

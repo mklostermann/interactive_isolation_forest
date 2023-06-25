@@ -27,30 +27,30 @@ def get_label(algorithm):
     elif algorithm == "tiws_if_replace2":
         return "TIWS-OTR"
     elif algorithm == "tiws_if_replace2_dp":
-        return "TIWS-OTR-DP (IIF)"
+        return "TIWS-OTR-DP"
     else:
         return algorithm
 
 def get_color(algorithm):
     # Default cycle: tab:blue-, tab:orange-, tab:green-, tab:red-, tab:purple-, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
     if algorithm == "iforest":
-        return "tab:brown"
+        return "tab:gray"
     elif algorithm == "iforest_rep":
         return "tab:blue"
     elif algorithm == "iforest_rep_dp":
-        return "tab:gray"
+        return "tab:brown"
     elif algorithm == "tiws_if":
         return "tab:brown"
     elif algorithm == "tiws_if_rep":
         return "tab:orange"
     elif algorithm == "tiws_if_replace2_fp":
-        return "tab:gray"
+        return "tab:brown"
     elif algorithm == "omd":
         return "tab:green"
     elif algorithm == "iforest_aad":
         return "tab:purple"
     elif algorithm == "tiws_if_replace2":
-        return "tab:brown"
+        return "deepskyblue"
     elif algorithm == "tiws_if_replace2_dp":
         return "tab:red"
     else:

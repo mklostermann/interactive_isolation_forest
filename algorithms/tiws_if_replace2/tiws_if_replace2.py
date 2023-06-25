@@ -24,8 +24,8 @@ def detect(datasets, budget, runs):
 
         for run in range(1, runs + 1):
             queried_instances = []
-            active_trees = [0] # Plots start at iteration 0
-            trained_trees = [0]
+            active_trees = [np.nan] # Plots start at iteration 0
+            trained_trees = [np.nan]
 
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.

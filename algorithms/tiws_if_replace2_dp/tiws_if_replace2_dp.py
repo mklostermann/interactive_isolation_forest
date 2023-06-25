@@ -8,11 +8,11 @@ import matplotlib.pylab as plt
 
 import helper
 
-# TiWS-iForest applied to IAD, repeatedly trained (creates TiWS-iForest in each iteration, using a new IF)
+# TiWS-iForest applied to IAD with replacement of the removed trees AFTER evaluation, with data pruning.
 # Implementation uses original code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb)
 def detect(datasets, budget, runs):
     for dataset_info in datasets:
-        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if_rep")
+        results_dir = helper.get_results_dir(dataset_info.dataset, "tiws_if_replace2_dp")
 
         if not os.path.exists(results_dir):
             os.makedirs(results_dir)
@@ -29,25 +29,37 @@ def detect(datasets, budget, runs):
             # Following code is mainly from weakly_supervised_algo()
             # It is important to train the initial unsupervised IF only once to see if there is an actual improvement.
 
-            for i in range(0, actual_budget):
-                # UNSUPERVISED TRAIN --------------------------------------------------------------
+            # UNSUPERVISED TRAIN --------------------------------------------------------------
 
-                # unsupervised train on the full train_data
-                # the weakly supervised train will be performed only on supervised_data
-                # sk_IF is the standard sklearn Isolation Forest
-                sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
-                trained_trees.append(100)
-                # Initialize a second forest, which will be used to evaluate the TiWS-iForest.
-                # Not very elegant, but an easy way to evaluate the forest later on.
-                tiws_IF = copy.deepcopy(sk_IF)
+            # unsupervised train on the full train_data
+            # the weakly supervised train will be performed only on supervised_data
+            # sk_IF is the standard sklearn Isolation Forest
+            sk_IF = IsolationForest(n_estimators=100, max_samples=256).fit(data)
+            trained_trees.append(100)
+            # Initialize a second forest, which will be used to evaluate the TiWS-iForest.
+            # Not very elegant, but an easy way to evaluate the forest later on.
+            tiws_IF = copy.deepcopy(sk_IF)
+            for i in range(0, actual_budget):
 
                 if i == 0:
                     # Initially, we only have a plain isolation forest; inversion required, as it returns the "opposite
                     # of the anomaly score defined in the original paper"
-                    active_trees.append(100)
+                    active_trees.append(sk_IF.n_estimators)
                     scores = -sk_IF.score_samples(data)
                     queried = np.argsort(-scores)[0]
                 else:
+                    # MKL: Tree replacement
+                    n_replaced_trees = sk_IF.n_estimators - tiws_IF.n_estimators
+                    trained_trees.append(n_replaced_trees)
+                    if n_replaced_trees > 0:
+                        pruned_data_indices = [i for i in range(dataset_info.samples_count)
+                                               if (i not in queried_instances or labels[i] == 0)]
+                        new_IF = IsolationForest(n_estimators=n_replaced_trees, max_samples=256).fit(
+                            data[pruned_data_indices])
+                        tiws_IF.estimators_.extend(new_IF.estimators_)
+                        tiws_IF.estimators_features_.extend(new_IF.estimators_features_)
+                        tiws_IF.n_estimators = sk_IF.n_estimators
+
                     # Use TiWS-iForest with increasing feedback
                     supervised_data = data[queried_instances]
                     supervised_labels = labels[queried_instances]
@@ -66,7 +78,7 @@ def detect(datasets, budget, runs):
                     # ap_forest_test         : collection of average precision of each tree in the forests obtained with the learned ordering
 
                     # train anomaly scores
-                    _, tree_supervised = compute_tree_anomaly_scores(sk_IF,
+                    _, tree_supervised = compute_tree_anomaly_scores(tiws_IF,
                                                                      supervised_data)
 
                     # average precision of trees on the supervised dataset
@@ -106,8 +118,8 @@ def detect(datasets, budget, runs):
                     n_trees = get_last_occurrence_argmax(ap_forest_supervised) + 1
                     active_trees.append(n_trees)
                     tiws_indices = learned_ordering[0:n_trees]
-                    tiws_IF.estimators_ = np.array(sk_IF.estimators_)[tiws_indices]
-                    tiws_IF.estimators_features_ = np.array(sk_IF.estimators_features_)[tiws_indices]
+                    tiws_IF.estimators_ = list(np.array(tiws_IF.estimators_)[tiws_indices])
+                    tiws_IF.estimators_features_ = list(np.array(tiws_IF.estimators_features_)[tiws_indices])
                     tiws_IF.n_estimators = n_trees
 
                     scores = -tiws_IF.score_samples(data)

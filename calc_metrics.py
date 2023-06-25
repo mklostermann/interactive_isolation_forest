@@ -1,5 +1,6 @@
 import argparse
 
+import math
 import numpy as np
 import scipy.stats as st
 import os
@@ -20,8 +21,8 @@ def calc_mean(data, output_file):
     for i in range(0, npdata.shape[1]):  # For every iteration of all runs
         iter_data = npdata[:, i]
         stderr = st.sem(iter_data)
-        if stderr == 0:
-            cidev.append(0)
+        if stderr == 0 or math.isnan(stderr):
+            cidev.append(stderr)
         else:
             ci = st.norm.interval(confidence=0.95, loc=mean[i], scale=stderr)
             cidev.append(ci[1] - ci[0])

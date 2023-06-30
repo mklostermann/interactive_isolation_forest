@@ -25,9 +25,9 @@ def get_label(algorithm):
     elif algorithm == "iforest_aad":
         return "IF-AAD"
     elif algorithm == "tiws_if_replace2":
-        return "TIWS-OTR"
+        return "IIF"
     elif algorithm == "tiws_if_replace2_dp":
-        return "TIWS-OTR-DP"
+        return "IIF-DP"
     else:
         return algorithm
 

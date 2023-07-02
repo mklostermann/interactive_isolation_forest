@@ -119,6 +119,9 @@ def main(datasets, algorithms):
                             anomalies_seen = np.concatenate(([0], omd_anomalies_seen[i][1:])) # Skip first element (iter)
                             all_anomalies_seen[filename].append(anomalies_seen)
 
+                            # Store every run in separate file, to allow creating a critical differences plot later
+                            np.savetxt(os.path.join(metrics_dir, f"anomalies_seen-{dataset}#{i+1}.csv"), anomalies_seen, fmt='%d', delimiter=',')
+
                             # P@n
                             # Start with one to omit NaN for iteration 0
                             iter_n = np.concatenate(([1], np.arange(1, anomalies_seen.shape[0])))

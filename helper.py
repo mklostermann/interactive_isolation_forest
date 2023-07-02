@@ -111,10 +111,8 @@ def get_metrics_dir(dataset, algorithm=None):
     return os.path.abspath(os.path.join(os.getcwd(), f"metrics/{dataset}/{'' if algorithm is None else algorithm}"))
 
 
-def get_plot_file(dataset, algorithms, plotname):
-    sorted_algorithms = algorithms.copy()
-    sorted_algorithms.sort()
-    return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{'_'.join(sorted_algorithms)}-{plotname}.pdf"))
+def get_plot_file(dataset, algorithms, plotname, extension=".pdf"):
+    return os.path.abspath(os.path.join(os.getcwd(), f"plots/{dataset}-{'_'.join(sorted(algorithms))}-{plotname}{extension}"))
 
 
 def get_metrics_files_for_algorithms(dataset, algorithms, name):
@@ -126,7 +124,6 @@ def get_metrics_files_for_algorithms(dataset, algorithms, name):
 
 def get_filename(path):
     return os.path.basename(path).rsplit(".", 1)[0]
-
 
 def save_queried_instances(queried_instances, results_dir, data_file, run):
     queried_file = os.path.join(results_dir, f"queried_instances-{get_filename(data_file)}#{run}.csv")

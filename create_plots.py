@@ -4,6 +4,9 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from critdd import Diagram
+import os
+import re
 
 import helper
 
@@ -100,13 +103,53 @@ def plot_active_trees(dataset, algorithms, algorithm_result_file, output_file):
     fig.savefig(output_file, format='pdf', bbox_inches='tight')
     plt.close(fig)
 
+def plot_cdp(cdp_df, datasets, algorithms):
+    df = cdp_df.pivot(
+        index="dataset_run",
+        columns="algorithm",
+        values="anomalies_seen"
+    )
 
-def main(datasets, algorithms):
+    diagram = Diagram(
+        df.to_numpy(),
+        treatment_names=list(map(get_label, df.columns)),
+        maximize_outcome=True
+    )
+    print(diagram.average_ranks)
+
+    diagram.to_file(
+        helper.get_plot_file('_'.join(sorted(datasets)), algorithms, "cdp", ".tex"),
+        alpha=.01,
+        adjustment="holm",
+        reverse_x=True
+        # axis_options={"title": "critdd"},
+    )
+
+def main(datasets, algorithms, cdp):
     logging.basicConfig(filename="log/create_plots.log", filemode='w',
                         format='%(asctime)s [%(threadName)s] %(message)s', level=logging.INFO)
     logging.info("==========")
     logging.info(f"Creating plots for data sets {datasets} and algorithms {algorithms}")
     logging.info("==========")
+
+    if cdp:
+        logging.info("Creating critical difference plot")
+        cdp_df = pd.DataFrame(columns=["algorithm", "dataset_run", "anomalies_seen", "dataset"])
+        for algorithm in algorithms:
+            for dataset in datasets:
+                metrics_dir = helper.get_metrics_dir(dataset, algorithm)
+                for file in os.scandir(metrics_dir):
+                    match = re.search(r"\Aanomalies_seen-(\w+)#(\d+)\.csv\Z", file.name)
+                    if match is not None:
+                        run = match.group(2)
+                        dataframe = pd.read_csv(file.path, header=None)
+                        data = dataframe.to_numpy(dtype=float)
+                        cdp_df.loc[len(cdp_df)] = [algorithm, f"{dataset}-{run}", data[-1], dataset]
+
+        for dataset in datasets:
+            df = cdp_df.drop(cdp_df[cdp_df.dataset != dataset].index)
+            plot_cdp(df, [dataset], algorithms)
+        plot_cdp(cdp_df, datasets, algorithms)
 
     for dataset in datasets:
         logging.info(f"Creating plots for {dataset}")
@@ -136,6 +179,8 @@ if __name__ == '__main__':
                         help="algorithms to run the detection on (all if omitted)")
     parser.add_argument("-ds", "--datasets", type=str, nargs="*",
                         help="data sets to run the detection on (all if omitted)")
+    parser.add_argument("-cdp", "--critical_difference_plot", action=argparse.BooleanOptionalAction,
+                        help="create critical difference plot")
 
     args = parser.parse_args()
 
@@ -145,4 +190,4 @@ if __name__ == '__main__':
     if args.datasets is None:
         args.datasets = helper.get_all_datasets()
 
-    main(args.datasets, args.algorithms)
+    main(args.datasets, args.algorithms, args.critical_difference_plot is True)

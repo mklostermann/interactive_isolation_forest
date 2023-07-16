@@ -1,5 +1,6 @@
- # isolation_forest-aad
+ # interactive_isolation_forest
 Comparison of different anomaly detection algorithms based on Isolation Forest for interactive anomaly detection.
+Includes the new algorithm Interactive Isolation Forest (IIF).
 
 - The purpose was to rapidly prototype new algorithms and compare them. *These prototype implementations should be optimized before using them in other scenarios.* The algorithms also do not support to set the parameters for Isolation Forest (number of trees...).
 - Algorithms using TiWS-iForest are based on code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb, MIT License, Copyright (c) 2021 tombarba).

@@ -73,18 +73,6 @@ def get_dataset_info_file():
     return os.path.abspath("datasets/info.json")
 
 
-def get_outlier_rate(data_file_name): # TODO: remove (was moved to prepare_datasets, use DatasetInfo instead)
-    outlier_rate = None
-    downsampled = False
-
-    match = re.search(r"_(\d\d)_(v?)", data_file_name)
-    if match is not None:
-        outlier_rate = int(match.group(1))
-        downsampled = match.group(2) is not None
-
-    return outlier_rate, downsampled
-
-
 def get_all_data_files(dataset, extension=".csv"):
     return [os.path.abspath(file.path) for file in os.scandir(f"datasets/{dataset}") if file.name.endswith(extension)]
 

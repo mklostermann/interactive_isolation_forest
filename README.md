@@ -1,5 +1,11 @@
  # isolation_forest-aad
-Comparison of different anomaly detection algorithms based on Isolation Forest with active learning (active anomaly detection).
+Comparison of different anomaly detection algorithms based on Isolation Forest for interactive anomaly detection.
+
+- The purpose was to rapidly prototype new algorithms and compare them. *These prototype implementations should be optimized before using them in other scenarios.* The algorithms also do not support to set the parameters for Isolation Forest (number of trees...).
+- Algorithms using TiWS-iForest are based on code from https://github.com/tombarba/TinyWeaklyIsolationForest (weakly_supervised.ipynb, MIT License, Copyright (c) 2021 tombarba).
+- IF-AAD and OMD are implemented by scripts that execute the original implementations, which need to be cloned into the same parent directory as this repository:
+  - IF-AAD: https://github.com/shubhomoydas/ad_examples
+  - OMD: https://github.com/siddiqmd/FeedbackIsolationForest
 
 ```pip install -r requirements.txt```
 
@@ -43,8 +49,8 @@ Metrics are calculated using the script `calc_metrics.py [DATASETS] [ALGORITHMS]
 ## Plots
 Following plots are generated from the metrics (one plot for each data set,
 showing all algorithms):
-* Anomalies / Iteration
-* TODO?: P@n, R@n, F1@n
+* Anomalies / iteration
+* Trained trees / iteration (only for applicable algorithms)
 
 Plots are generated using the script `create_plots.py [DATASETS] [ALGORITHMS]`
 
